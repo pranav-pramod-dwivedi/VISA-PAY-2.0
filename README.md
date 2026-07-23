@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
+  <img src="VISA-PAY-2.0/screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
 </p>
 
 <h1 align="center">Visa Pay UI 2.0</h1>
 
 <p align="center">
-A handcrafted fintech UI concept built with vanilla HTML, CSS & JavaScript.
+A handcrafted fintech UI concept built entirely with HTML, CSS & JavaScript.
 <br>
-Version 2.0 introduces a complete visual redesign inspired by Liquid Glass, alongside rebuilt interfaces, smoother interactions and a more consistent user experience.
+Version 2.0 is a complete redesign of my original Visa Pay UI project, introducing a new Liquid Glass design language, refined interactions and a significantly improved user experience.
 </p>
 
 <p align="center">
@@ -19,19 +19,25 @@ Version 2.0 introduces a complete visual redesign inspired by Liquid Glass, alon
 
 ---
 
-## About
+# About
 
-Visa Pay UI began as a simple UI exploration and gradually evolved into a complete digital banking interface.
+Visa Pay UI started as a small UI experiment and slowly evolved into a complete digital banking interface.
 
-Instead of continuously adding new pages, Version 2.0 focuses on refining the entire experience. Nearly every screen has been redesigned from scratch with a stronger emphasis on visual consistency, handcrafted interactions and cleaner architecture.
+Rather than simply adding new pages, Version 2.0 focuses on redesigning the entire experience. Nearly every screen has been rebuilt with a stronger emphasis on consistency, modern visuals and smoother interactions.
 
-Everything you see—from layouts and animations to blur effects and components—was designed and developed manually using only HTML, CSS and JavaScript.
+Everything inside this project has been handcrafted.
 
-No UI frameworks.
+No React.
+
+No Tailwind.
+
+No Bootstrap.
 
 No component libraries.
 
 No templates.
+
+Every layout, animation, blur effect, transition, card, button and interaction has been designed and written manually using vanilla HTML, CSS and JavaScript.
 
 ---
 
@@ -39,49 +45,49 @@ No templates.
 
 <table>
 <tr>
-<td><img src="screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
-<td><img src="screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
 </tr>
 </table>
 
 ---
 
-# What's New in Version 2.0
+# What's New in 2.0
 
-- Complete UI redesign
-- Liquid Glass inspired design language
-- Reworked navigation system
-- Fixed broken routes and unfinished pages
-- Redesigned payment experience
-- Refined dashboard layout
-- Improved banking interface
-- Better profile & settings pages
-- New statistics and analytics screens
+- Complete visual overhaul
+- Liquid Glass inspired interface
+- Redesigned dashboard
+- Refined payment experience
+- Rebuilt banking screens
+- Improved profile & settings
+- New analytics and statistics pages
+- Better navigation flow
+- Fixed broken routes from Version 1
+- Consistent spacing and typography
 - Cleaner component hierarchy
-- More responsive layouts
-- Improved spacing and typography
 - Smoother transitions and animations
-- Consistent design system across the application
-- Hundreds of visual refinements throughout the project
+- Improved responsive layouts
+- Better organization of assets and pages
+- Hundreds of small visual refinements across the project
 
 ---
 
@@ -89,50 +95,78 @@ No templates.
 
 ### Dashboard
 
-- Financial overview
-- Quick actions
-- Recent transactions
+- Account overview
 - Balance cards
-- Statistics
+- Recent transactions
+- Spending insights
+- Quick actions
+- Financial statistics
 
 ### Payments
 
-- Send money
-- Receive money
-- Wallet
+- Send Money
+- Receive Money
+- Wallet Interface
+- Payment Sheet
 - Tap to Pay
-- Payment sheet
-- Transaction history
+- Transaction Confirmation
+- Payment History
 
 ### Banking
 
-- Bank accounts
-- Payment cards
-- Device management
-- Top-up
-- Security settings
+- Bank Accounts
+- Debit & Credit Cards
+- Card Management
+- Top Up
+- Device Management
+- Security Controls
 
-### Services
+### Finance
 
-- Flights
-- Loans
-- Notifications
-- Address management
-- Legal pages
-- Help Center
+- Loan Interface
+- Transaction Timeline
+- Analytics Dashboard
+- Financial Insights
+
+### Travel
+
+- Flight Booking
+- Travel Payments
+- Booking Cards
+
+### Notifications
+
+- Notification Center
+- Interactive Notification Cards
+- Status Indicators
 
 ### User
 
-- Profile
+- User Profile
 - Settings
-- Preferences
-- Account management
+- Address Management
+- Help Center
+- Legal Pages
+- Account Preferences
 
 ### Admin
 
-- Administrative dashboard
-- User management
-- Analytics interface
+- Admin Dashboard
+- User Management
+- Administrative Controls
+
+### UI & Design
+
+- Liquid Glass components
+- Glassmorphism effects
+- Smooth animations
+- Interactive buttons
+- Reusable cards
+- Consistent design language
+- Responsive layouts
+- Modern typography
+- Layered blur effects
+- Custom color system
 
 ---
 
@@ -140,16 +174,32 @@ No templates.
 
 - HTML5
 - CSS3
-- JavaScript
+- Vanilla JavaScript
 
-Everything in this repository has been handcrafted without relying on frontend frameworks or UI libraries.
+No frameworks were used while building this project.
+
+Everything—from the smallest UI component to the overall layout—was built manually.
 
 ---
 
-# Project Structure
+# Version Comparison
+
+| Version 1 | Version 2 |
+|------------|------------|
+| Basic fintech concept | Complete redesign |
+| Early design system | Unified design language |
+| Standard interface | Liquid Glass inspired UI |
+| Basic navigation | Improved navigation & routing |
+| Initial animations | Smoother handcrafted animations |
+| Inconsistent layouts | Refined spacing & hierarchy |
+| Several unfinished pages | More polished and complete experience |
+
+---
+
+# Folder Structure
 
 ```text
-Visa-Pay-UI/
+VISA-PAY-2.0
 │
 ├── css/
 ├── js/
@@ -159,22 +209,3 @@ Visa-Pay-UI/
 ├── pages/
 ├── index.html
 └── README.md
-```
-
----
-
-# Why this project?
-
-I built this project to challenge myself in designing and developing a modern fintech interface entirely from scratch.
-
-Rather than focusing solely on functionality, I wanted to explore visual hierarchy, interaction design, motion, glassmorphism, layout systems and overall user experience using nothing more than vanilla web technologies.
-
-Version 2.0 represents a significant redesign over the original project and reflects everything I learned while building Version 1.
-
----
-
-<p align="center">
-If you enjoyed the project, consider giving it a ⭐.
-<br><br>
-Made by <b>Pranav Dwivedi</b>
-</p>
