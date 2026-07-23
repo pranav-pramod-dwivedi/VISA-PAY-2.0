@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="VISA-PAY-2.0/screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
+  <img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
 </p>
 
 <h1 align="center">Visa Pay UI 2.0</h1>
@@ -7,37 +7,33 @@
 <p align="center">
 A handcrafted fintech UI concept built entirely with HTML, CSS & JavaScript.
 <br>
-Version 2.0 is a complete redesign of my original Visa Pay UI project, introducing a new Liquid Glass design language, refined interactions and a significantly improved user experience.
+A complete redesign of my original Visa Pay UI project featuring a new Liquid Glass design language, refined interactions and a significantly improved user experience.
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/HTML-5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
-<img src="https://img.shields.io/badge/CSS-3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-<img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
-<img src="https://img.shields.io/badge/Version-2.0-black?style=for-the-badge">
+  <img src="https://img.shields.io/badge/HTML-5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
+  <img src="https://img.shields.io/badge/CSS-3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
+  <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
+  <img src="https://img.shields.io/badge/Version-2.0-black?style=for-the-badge">
 </p>
 
 ---
 
 # About
 
-Visa Pay UI started as a small UI experiment and slowly evolved into a complete digital banking interface.
+Visa Pay UI started as a simple frontend UI practice project and eventually grew into a complete digital banking interface.
 
-Rather than simply adding new pages, Version 2.0 focuses on redesigning the entire experience. Nearly every screen has been rebuilt with a stronger emphasis on consistency, modern visuals and smoother interactions.
+Version 2.0 isn't just an update—it is a complete rebuild. Almost every screen from the original project has been redesigned with a stronger focus on visual consistency, modern fintech aesthetics and overall user experience.
 
-Everything inside this project has been handcrafted.
+Everything inside this repository has been handcrafted.
 
-No React.
+- No React
+- No Tailwind CSS
+- No Bootstrap
+- No UI libraries
+- No copied templates
 
-No Tailwind.
-
-No Bootstrap.
-
-No component libraries.
-
-No templates.
-
-Every layout, animation, blur effect, transition, card, button and interaction has been designed and written manually using vanilla HTML, CSS and JavaScript.
+Every page, layout, animation, blur effect, transition, card, button and interaction has been designed and developed manually using only HTML, CSS and JavaScript.
 
 ---
 
@@ -45,49 +41,50 @@ Every layout, animation, blur effect, transition, card, button and interaction h
 
 <table>
 <tr>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
+<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
 </tr>
 </table>
 
 ---
 
-# What's New in 2.0
+# What's New in Version 2.0
 
-- Complete visual overhaul
-- Liquid Glass inspired interface
-- Redesigned dashboard
-- Refined payment experience
-- Rebuilt banking screens
-- Improved profile & settings
-- New analytics and statistics pages
+- Complete UI redesign
+- Liquid Glass inspired design language
+- Rebuilt dashboard
+- Improved payment experience
+- Redesigned banking interface
+- Refined profile & settings pages
+- New analytics and statistics screens
 - Better navigation flow
-- Fixed broken routes from Version 1
-- Consistent spacing and typography
-- Cleaner component hierarchy
-- Smoother transitions and animations
+- Fixed broken links from Version 1
 - Improved responsive layouts
-- Better organization of assets and pages
-- Hundreds of small visual refinements across the project
+- Cleaner project structure
+- More consistent spacing
+- Better typography
+- Handcrafted animations and transitions
+- Improved visual hierarchy
+- Hundreds of small UI refinements across the application
 
 ---
 
@@ -95,43 +92,43 @@ Every layout, animation, blur effect, transition, card, button and interaction h
 
 ### Dashboard
 
-- Account overview
+- Financial overview
 - Balance cards
+- Quick actions
 - Recent transactions
 - Spending insights
-- Quick actions
-- Financial statistics
+- Statistics dashboard
 
 ### Payments
 
 - Send Money
 - Receive Money
 - Wallet Interface
-- Payment Sheet
 - Tap to Pay
-- Transaction Confirmation
-- Payment History
+- Payment Sheet
+- Transaction History
+- Payment Confirmation
 
 ### Banking
 
-- Bank Accounts
-- Debit & Credit Cards
+- Multiple Bank Accounts
 - Card Management
-- Top Up
+- Debit & Credit Cards
 - Device Management
+- Top Up
 - Security Controls
 
 ### Finance
 
 - Loan Interface
+- Financial Analytics
 - Transaction Timeline
-- Analytics Dashboard
-- Financial Insights
+- Spending Overview
 
 ### Travel
 
-- Flight Booking
-- Travel Payments
+- Flight Booking UI
+- Travel Payment Flow
 - Booking Cards
 
 ### Notifications
@@ -147,7 +144,7 @@ Every layout, animation, blur effect, transition, card, button and interaction h
 - Address Management
 - Help Center
 - Legal Pages
-- Account Preferences
+- Preferences
 
 ### Admin
 
@@ -155,18 +152,17 @@ Every layout, animation, blur effect, transition, card, button and interaction h
 - User Management
 - Administrative Controls
 
-### UI & Design
+### Design
 
-- Liquid Glass components
-- Glassmorphism effects
-- Smooth animations
-- Interactive buttons
-- Reusable cards
-- Consistent design language
-- Responsive layouts
-- Modern typography
-- Layered blur effects
-- Custom color system
+- Liquid Glass UI
+- Glassmorphism Components
+- Layered Blur Effects
+- Smooth Animations
+- Interactive Buttons
+- Reusable Components
+- Modern Typography
+- Responsive Layouts
+- Consistent Design System
 
 ---
 
@@ -176,9 +172,9 @@ Every layout, animation, blur effect, transition, card, button and interaction h
 - CSS3
 - Vanilla JavaScript
 
-No frameworks were used while building this project.
+No frontend frameworks or component libraries were used.
 
-Everything—from the smallest UI component to the overall layout—was built manually.
+Everything—from the smallest icon placement to complete page layouts—has been built manually.
 
 ---
 
@@ -186,13 +182,13 @@ Everything—from the smallest UI component to the overall layout—was built ma
 
 | Version 1 | Version 2 |
 |------------|------------|
-| Basic fintech concept | Complete redesign |
-| Early design system | Unified design language |
-| Standard interface | Liquid Glass inspired UI |
+| Initial UI concept | Complete redesign |
+| Basic layout | Refined design system |
+| Standard interface | Liquid Glass interface |
 | Basic navigation | Improved navigation & routing |
-| Initial animations | Smoother handcrafted animations |
-| Inconsistent layouts | Refined spacing & hierarchy |
-| Several unfinished pages | More polished and complete experience |
+| Simple animations | Smoother handcrafted animations |
+| Inconsistent pages | Consistent visual language |
+| Prototype | More polished application |
 
 ---
 
@@ -201,11 +197,13 @@ Everything—from the smallest UI component to the overall layout—was built ma
 ```text
 VISA-PAY-2.0
 │
-├── css/
-├── js/
-├── images/
-├── screenshots/
-├── fonts/
-├── pages/
-├── index.html
+├── Visa-Pay-UI-main/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   ├── screenshots/
+│   ├── fonts/
+│   ├── pages/
+│   └── index.html
+│
 └── README.md
