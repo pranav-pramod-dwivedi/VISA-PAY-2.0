@@ -41,27 +41,27 @@ Every page, layout, animation, blur effect, transition, card, button and interac
 
 <table>
 <tr>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-34-528_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-39-012_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-21-56-077_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-03-560_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-08-467_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-15-326_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-22-458_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-27-369_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-35-277_com.pranav.visapay.jpg"></td>
 </tr>
 
 <tr>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
-<td><img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-45-937_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-48-897_com.pranav.visapay.jpg"></td>
+<td><img src="Visa-Pay-UI-main/screenshots/Screenshot_2026-07-23-19-22-52-431_com.pranav.visapay.jpg"></td>
 </tr>
 </table>
 
