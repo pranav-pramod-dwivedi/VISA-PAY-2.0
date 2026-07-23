@@ -1,0 +1,126 @@
+/* ============================================================
+   NovaPay — Liquid Glass (Apple "Tahoe"-grade material)
+   Include AFTER Tailwind + Font Awesome:
+     <link rel="stylesheet" href="glass.css">
+
+   The material is built from stacked layers:
+     1. backdrop blur + saturation (the frost)
+     2. a translucent tint fill (the body)
+     3. a bright refractive RIM (inner light bending at edges)
+     4. a moving SPECULAR highlight (catches a light source)
+     5. subtle chromatic dispersion at the corners
+   ============================================================ */
+
+:root {
+  --lg-blue: #0A84FF;
+  --lg-radius: 28px;
+  --lg-rim: rgba(255,255,255,.9);
+  --lg-rim-soft: rgba(255,255,255,.35);
+  --lg-tint: rgba(255,255,255,.16);
+  --lg-tint-2: rgba(255,255,255,.04);
+  --lg-shadow: 0 24px 60px -22px rgba(20,40,90,.45);
+  --lg-text: #0B1220;
+}
+
+/* ---------- ambient scene behind the glass ---------- */
+.lg-bg { position: fixed; inset: 0; z-index: -3; overflow: hidden; background: linear-gradient(160deg,#e8eefc 0%,#f3f0fb 55%,#eaf1ff 100%); }
+.lg-bg::before, .lg-bg::after {
+  content:""; position:absolute; border-radius:50%; filter:blur(70px); opacity:.6; animation:lgFloat 20s ease-in-out infinite;
+}
+.lg-bg::before { width:62vw; height:62vw; top:-20vw; left:-14vw; background:radial-gradient(circle at 35% 35%,#7db1ff,transparent 68%); }
+.lg-bg::after  { width:58vw; height:58vw; bottom:-22vw; right:-16vw; background:radial-gradient(circle at 65% 65%,#c9b8ff,transparent 68%); animation-delay:-9s; }
+.lg-blob { position:fixed; z-index:-2; width:44vw; height:44vw; border-radius:50%; filter:blur(80px);
+  background:radial-gradient(circle,rgba(10,132,255,.20),transparent 70%); top:34%; left:22%; animation:lgFloat 26s ease-in-out infinite -5s; }
+@keyframes lgFloat { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(5vw,-4vw) scale(1.1)} }
+
+/* ---------- THE liquid-glass surface ---------- */
+.glass {
+  position: relative;
+  border-radius: var(--lg-radius);
+  /* mostly-transparent tint — the wallpaper reads THROUGH it (iOS style) */
+  background: rgba(255,255,255,.14);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  box-shadow:
+    0 12px 34px -14px rgba(20,40,90,.28),
+    inset 0 0.5px 0.5px rgba(255,255,255,.6),   /* faint top hairline */
+    inset 0 0 0 0.5px rgba(255,255,255,.14);     /* thin sheath */
+  isolation: isolate;
+  color: var(--lg-text);
+}
+/* thin subtle RIM — a faint bright hairline, NOT a thick colored band */
+.glass::before {
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:0.8px; pointer-events:none; z-index:2;
+  background: linear-gradient(150deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.05) 40%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.35) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .8;
+}
+/* soft top-corner specular glow — subtle */
+.glass::after {
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1;
+  background: radial-gradient(120% 80% at 12% 0%, rgba(255,255,255,.22), transparent 55%);
+  opacity:.8;
+}
+
+/* stronger, "thicker" material for hero surfaces (cards, sheets) */
+.glass-thick {
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  background: rgba(255,255,255,.2);
+}
+
+/* interactive tap feedback with a light-follow bloom */
+.glass-tap { transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s; }
+.glass-tap:active { transform: scale(.97); }
+
+/* pills / buttons */
+.glass-pill {
+  position: relative; border-radius: 999px; color: var(--lg-text);
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 6px 18px rgba(20,40,90,.12), inset 0 0.5px 0.5px rgba(255,255,255,.55), inset 0 0 0 0.5px rgba(255,255,255,.16);
+}
+
+/* frosted floating nav — the tab bar */
+.glass-nav {
+  border-radius: 999px;
+  background: rgba(255,255,255,.2);
+  backdrop-filter: blur(36px) saturate(160%);
+  -webkit-backdrop-filter: blur(36px) saturate(160%);
+  box-shadow: 0 16px 44px rgba(20,40,90,.18), inset 0 0.5px 0.5px rgba(255,255,255,.6), inset 0 0 0 0.5px rgba(255,255,255,.18);
+}
+
+/* liquid-glass bank-card sheen overlay */
+.lg-card { position: relative; overflow: hidden; border-radius: 28px; isolation: isolate; }
+.lg-card > .lg-sheen {
+  content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
+  background: linear-gradient(115deg, transparent 28%, rgba(255,255,255,.42) 46%, rgba(255,255,255,.1) 54%, transparent 72%);
+  transform: translateX(-40%); animation: lgSheen 6.5s ease-in-out infinite;
+}
+@keyframes lgSheen { 0%,100%{transform:translateX(-45%)} 50%{transform:translateX(45%)} }
+
+/* ---------- DARK ---------- */
+:root[data-theme="dark"] { --lg-text:#eaf0ff; --lg-tint:rgba(60,72,104,.34); --lg-tint-2:rgba(30,38,60,.18); --lg-rim:rgba(255,255,255,.5); }
+:root[data-theme="dark"] .lg-bg { background: linear-gradient(160deg,#0a0f1e,#0d1226 60%,#0a1020); }
+/* dark glass = translucent DARK (matches iOS control-center reference) */
+:root[data-theme="dark"] .glass, :root[data-theme="dark"] .glass-thick {
+  background: rgba(40,44,54,.55);
+  backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%);
+  box-shadow: 0 16px 40px -18px rgba(0,0,0,.7), inset 0 0.5px 0.5px rgba(255,255,255,.16), inset 0 0 0 0.5px rgba(255,255,255,.07);
+  color:#f2f5ff;
+}
+:root[data-theme="dark"] .glass::after { background: radial-gradient(120% 80% at 12% 0%, rgba(255,255,255,.1), transparent 55%); }
+:root[data-theme="dark"] .glass::before { background: linear-gradient(150deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.03) 45%, rgba(255,255,255,.2) 100%); }
+:root[data-theme="dark"] .glass-nav { background: rgba(36,40,50,.6); box-shadow: 0 16px 44px rgba(0,0,0,.5), inset 0 0.5px 0.5px rgba(255,255,255,.18); }
+:root[data-theme="dark"] .glass-pill { background: rgba(52,56,68,.55); color:#eaf0ff; box-shadow: inset 0 0.5px 0.5px rgba(255,255,255,.16); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --lg-text:#eaf0ff; }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lg-bg::before, .lg-bg::after, .lg-blob, .lg-card > .lg-sheen { animation: none; }
+}

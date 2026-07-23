@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | My Flight</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; padding-bottom:40px; }
+        .mono { font-family:'JetBrains Mono',monospace; }
+
+        /* richer ambient scene so the high-transparency glass has something to refract */
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(165deg,#dfe7ff 0%,#efe4fb 45%,#ffe6ea 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:78vw; height:78vw; top:-22vw; left:-18vw; border-radius:50%;
+            background:radial-gradient(circle,#7d9dff,transparent 64%); opacity:.7; filter:blur(48px); animation:drift 22s ease-in-out infinite; }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-20vw; right:-16vw; border-radius:50%;
+            background:radial-gradient(circle,#ff8fa0,transparent 64%); opacity:.6; filter:blur(48px); animation:drift 26s ease-in-out infinite -8s; }
+        .orb3 { position:fixed; z-index:-1; width:44vw; height:44vw; border-radius:50%; top:34%; left:26%; filter:blur(60px);
+            background:radial-gradient(circle,rgba(168,85,247,.4),transparent 68%); animation:drift 30s ease-in-out infinite -4s; }
+        @keyframes drift { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(6vw,-4vw) scale(1.12);} }
+
+        /* HIGH-TRANSPARENCY liquid glass — the scene reads clearly through it */
+        .glass {
+            position:relative;
+            background:rgba(255,255,255,.14);
+            backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%);
+            border:1px solid rgba(255,255,255,.35);
+            box-shadow:0 18px 50px -20px rgba(30,40,90,.4), inset 0 1px 0.5px rgba(255,255,255,.7), inset 0 0 0 0.5px rgba(255,255,255,.12);
+            border-radius:28px; isolation:isolate; }
+        /* bright refractive rim */
+        .glass::before {
+            content:""; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none; z-index:2;
+            background:linear-gradient(150deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.04) 42%,rgba(255,255,255,.03) 60%,rgba(255,255,255,.45) 100%);
+            -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+                    mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); mask-composite:exclude; }
+        /* soft specular sheen top-left */
+        .glass::after {
+            content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1;
+            background:radial-gradient(130% 90% at 10% 0%,rgba(255,255,255,.35),transparent 55%); }
+        .glass > * { position:relative; z-index:3; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* VietJet red header band on the ticket */
+        .vj-red { background:linear-gradient(100deg,#E30613 0%,#c00511 100%); }
+        .vj-logo { font-weight:800; font-style:italic; letter-spacing:-.5px; }
+        .vj-logo .yel { color:#FFD200; }
+
+        /* translucent red route strip — tinted glass, not a solid slab */
+        .route-strip { color:#fff; border-radius:22px; padding:18px 20px; position:relative; overflow:hidden;
+            background:linear-gradient(105deg,rgba(227,6,19,.88) 0%,rgba(184,5,15,.82) 100%);
+            backdrop-filter:blur(10px) saturate(140%); -webkit-backdrop-filter:blur(10px) saturate(140%);
+            box-shadow:0 12px 30px -12px rgba(227,6,19,.6), inset 0 1px 0 rgba(255,255,255,.25); }
+        .route-strip::after{ content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px; border-radius:50%; background:rgba(255,210,0,.22); }
+        .rs-code { font-size:30px; font-weight:800; line-height:1; }
+        .rs-city { font-size:10px; font-weight:600; opacity:.85; margin-top:3px; }
+        .rs-time { font-size:12px; font-weight:700; opacity:.9; }
+        .flight-line { flex:1; height:2px; margin:0 10px; position:relative; background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 6px,transparent 6px 12px); }
+        .flight-line i { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:14px; }
+
+        /* leg card */
+        .leg-dot { width:11px; height:11px; border-radius:50%; border:2.5px solid #E30613; background:#fff; flex-shrink:0; }
+        .leg-track { width:2px; flex:1; background:linear-gradient(#E30613,#f9a8ae); margin:2px auto; min-height:34px; }
+        .pill { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px; border-radius:99px; }
+
+        .info-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
+        .info-row + .info-row { border-top:1px solid rgba(120,140,190,.14); }
+        .info-k { font-size:12px; font-weight:600; color:#8a93ab; }
+        .info-v { font-size:13px; font-weight:800; color:#0f172a; }
+
+        .layover { align-self:center; font-size:10px; font-weight:800; color:#f59e0b; background:rgba(245,158,11,.14);
+            padding:6px 14px; border-radius:99px; text-transform:uppercase; letter-spacing:.05em; }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .glass{ background:rgba(40,44,54,.6); border-color:rgba(255,255,255,.08); }
+        :root[data-theme="dark"] .info-v{ color:#eaf0ff; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+    <div class="orb3"></div>
+
+    <div class="min-h-screen">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="user.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">My Flight</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <section class="px-5 space-y-5">
+            <!-- boarding-pass hero -->
+            <div class="glass overflow-hidden">
+                <div class="vj-red px-5 py-4 flex items-center justify-between" id="brand-bar">
+                    <span class="vj-logo text-white text-[19px]" id="brand-logo">Vietjet<span class="yel">Air</span>.com</span>
+                    <span class="text-[11px] font-bold text-yellow-300 mono" id="brand-tel">19001886</span>
+                </div>
+
+                <!-- route strip: BLR -> SGN -> ICN -->
+                <div class="p-4">
+                    <div class="route-strip">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="text-left">
+                                <div class="rs-code">BLR</div>
+                                <div class="rs-city">Bengaluru</div>
+                                <div class="rs-time mt-1">23:45</div>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center px-2">
+                                <span class="text-[9px] font-bold opacity-80 mb-1">16h 10m</span>
+                                <div class="w-full flex items-center">
+                                    <div class="flight-line"></div>
+                                    <i class="fa-solid fa-plane text-[13px]"></i>
+                                    <div class="flight-line"></div>
+                                </div>
+                                <span class="text-[9px] font-bold opacity-80 mt-1">1 stop · SGN</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="rs-code">ICN</div>
+                                <div class="rs-city">Incheon, Seoul</div>
+                                <div class="rs-time mt-1">19:25 <span class="text-[9px] align-top">+1</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- confirmed + booking ref (PNR hidden until PIN) -->
+                    <div class="flex items-center justify-between mt-4 px-1">
+                        <div>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Booking Ref (PNR)</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-[20px] font-extrabold mono" id="pnr" style="color:#E30613">••••••</p>
+                                <button id="pnr-btn" onclick="togglePnr()" class="text-[10px] font-bold px-2.5 py-1 rounded-full" style="background:rgba(227,6,19,.12);color:#E30613">
+                                    <i class="fa-solid fa-eye mr-1"></i>Show
+                                </button>
+                            </div>
+                        </div>
+                        <span class="pill" style="background:rgba(18,184,134,.15);color:#12b886">
+                            <i class="fa-solid fa-circle-check mr-1"></i>Confirmed
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- itinerary: two legs + layover -->
+            <div>
+                <h3 id="itin-hdr" class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-3">Itinerary · Wed, 15 Jul 2026</h3>
+                <div class="glass p-5" id="itin-body">
+                    <!-- LEG 1 -->
+                    <div class="flex gap-3.5">
+                        <div class="flex flex-col items-center pt-1">
+                            <div class="leg-dot"></div>
+                            <div class="leg-track"></div>
+                            <div class="leg-dot"></div>
+                        </div>
+                        <div class="flex-1 pb-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[15px] font-extrabold text-slate-900">23:45 · BLR</span>
+                                <span class="pill" style="background:rgba(227,6,19,.12);color:#E30613">VJ1802</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-semibold">Bengaluru · Kempegowda Intl</p>
+
+                            <div class="flex items-center gap-2 my-2 text-[10px] text-slate-400 font-bold">
+                                <i class="fa-solid fa-clock text-[9px]"></i> 4h 55m · Premium Eco
+                            </div>
+
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-[15px] font-extrabold text-slate-900">06:10 <span class="text-[10px] text-slate-400">+1</span> · SGN</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-semibold">Ho Chi Minh City · Tan Son Nhat</p>
+                        </div>
+                    </div>
+
+                    <!-- layover -->
+                    <div class="flex justify-center my-3">
+                        <span class="layover"><i class="fa-solid fa-hourglass-half mr-1"></i>6h 10m layover in Ho Chi Minh City</span>
+                    </div>
+
+                    <!-- LEG 2 -->
+                    <div class="flex gap-3.5">
+                        <div class="flex flex-col items-center pt-1">
+                            <div class="leg-dot"></div>
+                            <div class="leg-track"></div>
+                            <div class="leg-dot"></div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[15px] font-extrabold text-slate-900">12:20 · SGN</span>
+                                <span class="pill" style="background:rgba(227,6,19,.12);color:#E30613">VJ860</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-semibold">Ho Chi Minh City · Tan Son Nhat</p>
+
+                            <div class="flex items-center gap-2 my-2 text-[10px] text-slate-400 font-bold">
+                                <i class="fa-solid fa-clock text-[9px]"></i> 5h 05m · Premium Eco
+                            </div>
+
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-[15px] font-extrabold text-slate-900">19:25 · ICN</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-semibold">Incheon Intl · Seoul, South Korea</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- passenger + booking details -->
+            <div>
+                <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest px-2 mb-3">Passenger &amp; Booking</h3>
+                <div class="glass p-5">
+                    <div class="info-row"><span class="info-k">Passenger</span><span class="info-v">DWIVEDI, PRANAV</span></div>
+                    <div class="info-row"><span class="info-k">Fare Type</span><span class="info-v">Premium Eco</span></div>
+                    <div class="info-row"><span class="info-k">Booking Date</span><span class="info-v">25 Jul 2026</span></div>
+                    <div class="info-row"><span class="info-k">Contact</span><span class="info-v mono">+91 93408 72874</span></div>
+                    <div class="info-row"><span class="info-k">Total Paid</span><span class="info-v" id="fare" style="color:#12b886">₹22,763.00</span></div>
+                    <div class="info-row"><span class="info-k">Payment</span><span class="info-v"><i class="fa-brands fa-cc-visa text-blue-700 mr-1"></i>Visa · NovaPay</span></div>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <a href="unavailable.html" class="glass spring p-4 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-plane-departure text-[18px]" style="color:#E30613"></i>
+                    <span class="text-[12px] font-extrabold text-slate-800">Check-in</span>
+                </a>
+                <a href="unavailable.html" class="glass spring p-4 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-chair text-[18px]" style="color:#3a6bff"></i>
+                    <span class="text-[12px] font-extrabold text-slate-800">Pick Seat</span>
+                </a>
+            </div>
+
+            <p class="text-center text-[9px] text-slate-400 font-semibold pt-1 pb-6 leading-relaxed">
+                Operated by VietJet Air. NovaPay is a demo build — this itinerary is for<br>display only. Times shown in local airport time.
+            </p>
+        </section>
+    </div>
+    <!-- PIN OVERLAY (unlocks PNR) -->
+    <div id="pin-ov" style="position:fixed;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.75);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);max-width:448px;margin:0 auto">
+        <div class="flex items-center justify-center w-14 h-14 rounded-2xl mb-4" style="background:rgba(227,6,19,.12);color:#E30613">
+            <i class="fa-solid fa-shield-halved text-2xl"></i>
+        </div>
+        <h2 class="text-lg font-black text-slate-900 mb-1">Verify to Reveal PNR</h2>
+        <p id="pin-sub" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-6">Enter your NovaPay PIN</p>
+        <div class="flex gap-3 mb-6" id="pin-dots">
+            <div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+        </div>
+        <p id="pin-err" class="text-red-500 text-xs font-bold h-4 mb-3"></p>
+        <div class="grid grid-cols-3 gap-4" id="pin-pad"></div>
+        <button onclick="switchMethod()" id="otp-switch" class="mt-6 text-[11px] font-bold" style="color:#E30613">
+            <i class="fa-solid fa-mobile-screen mr-1"></i>Verify with OTP instead
+        </button>
+        <button onclick="closePin()" class="mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest">Cancel</button>
+    </div>
+    <style>
+        .pd { width:13px; height:13px; border-radius:50%; border:2px solid #cbd5e1; transition:.2s; }
+        .pd.on { background:#E30613; border-color:#E30613; }
+        .pk { width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.9);
+            font-size:22px; font-weight:700; color:#0f172a; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .pk:active { background:#E30613; color:#fff; }
+    </style>
+
+    <script src="app.js?v=16"></script>
+    <script>
+        // ---- return-leg variant (?leg=ret): VietJet ICN -> BLR, 2 legs via SGN ----
+        const isReturn = new URLSearchParams(location.search).get('leg') === 'ret';
+        if (isReturn) {
+            // route strip -> ICN ... BLR (1 stop, 28h50)
+            document.querySelectorAll('.rs-code')[0].textContent = 'ICN';
+            document.querySelectorAll('.rs-code')[1].textContent = 'BLR';
+            document.querySelectorAll('.rs-city')[0].textContent = 'Incheon, Seoul';
+            document.querySelectorAll('.rs-city')[1].textContent = 'Bengaluru';
+            document.querySelectorAll('.rs-time')[0].textContent = '21:15';
+            document.querySelectorAll('.rs-time')[1].innerHTML = '22:35 <span class="text-[9px] align-top">+1</span>';
+            document.querySelector('.route-strip .flex-1 span').textContent = '28h 50m';
+            document.querySelectorAll('.route-strip .flex-1 span')[1].textContent = '1 stop · SGN';
+            document.getElementById('itin-hdr').textContent = 'Itinerary · Sat, 25 Jul 2026';
+
+            const legs = [
+                { fno:'VJ861', dur:'5h 15m · Premium Eco · A321',
+                  dt:'21:15', dcode:'ICN', dsub:'Incheon · Seoul, South Korea',
+                  at:'00:30', aplus:true, acode:'SGN', asub:'Ho Chi Minh City · Tan Son Nhat' },
+                { fno:'VJ1801', dur:'4h 45m · Premium Eco · A321',
+                  dt:'19:20', dcode:'SGN', dsub:'Ho Chi Minh City · Tan Son Nhat',
+                  at:'22:35', acode:'BLR', asub:'Bengaluru · Kempegowda Intl' },
+            ];
+            const layovers = ['18h 50m layover in Ho Chi Minh City'];
+            const legHtml = (l) => `
+                <div class="flex gap-3.5">
+                    <div class="flex flex-col items-center pt-1">
+                        <div class="leg-dot"></div><div class="leg-track"></div><div class="leg-dot"></div>
+                    </div>
+                    <div class="flex-1 pb-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[15px] font-extrabold text-slate-900">${l.dt} · ${l.dcode}</span>
+                            <span class="pill" style="background:rgba(227,6,19,.12);color:#E30613">${l.fno}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-semibold">${l.dsub}</p>
+                        <div class="flex items-center gap-2 my-2 text-[10px] text-slate-400 font-bold">
+                            <i class="fa-solid fa-clock text-[9px]"></i> ${l.dur}
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-[15px] font-extrabold text-slate-900">${l.at} ${l.aplus?'<span class="text-[10px] text-slate-400">+1</span>':''} · ${l.acode}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-semibold">${l.asub}</p>
+                    </div>
+                </div>`;
+            const layHtml = (t) => `<div class="flex justify-center my-3"><span class="layover"><i class="fa-solid fa-hourglass-half mr-1"></i>${t}</span></div>`;
+            document.getElementById('itin-body').innerHTML =
+                legHtml(legs[0]) + layHtml(layovers[0]) + legHtml(legs[1]);
+
+            document.getElementById('fare').textContent = '₹55,769.00';
+        }
+
+        // ---- hide / reveal PNR behind the PIN ----
+        const PNR = 'DUZGHQ';
+        let pnrShown = false, pin = '';
+        function togglePnr() {
+            if (pnrShown) {
+                pnrShown = false;
+                document.getElementById('pnr').textContent = '••••••';
+                document.getElementById('pnr-btn').innerHTML = '<i class="fa-solid fa-eye mr-1"></i>Show';
+            } else {
+                openPin();
+            }
+        }
+        let method = 'pin';
+        function openPin() {
+            pin = ''; paintDots();
+            const err = document.getElementById('pin-err'); err.textContent = ''; err.style.color = '#ef4444';
+            document.getElementById('pin-ov').style.display = 'flex';
+        }
+        // design-only: flips label between PIN and OTP, reveal behaviour is identical
+        function switchMethod() {
+            method = method === 'pin' ? 'otp' : 'pin';
+            pin = ''; paintDots();
+            const sub = document.getElementById('pin-sub'), sw = document.getElementById('otp-switch');
+            if (method === 'otp') {
+                sub.textContent = 'Enter OTP sent to ••••2874';
+                sw.innerHTML = '<i class="fa-solid fa-hashtag mr-1"></i>Verify with PIN instead';
+            } else {
+                sub.textContent = 'Enter your NovaPay PIN';
+                sw.innerHTML = '<i class="fa-solid fa-mobile-screen mr-1"></i>Verify with OTP instead';
+            }
+        }
+        function closePin() { document.getElementById('pin-ov').style.display = 'none'; }
+        function paintDots() { document.querySelectorAll('#pin-dots .pd').forEach((d,i)=>d.classList.toggle('on', i<pin.length)); }
+        function revealPnr() {
+            pnrShown = true;
+            document.getElementById('pnr').textContent = PNR;
+            document.getElementById('pnr-btn').innerHTML = '<i class="fa-solid fa-eye-slash mr-1"></i>Hide';
+            closePin();
+            if (navigator.vibrate) navigator.vibrate(12);
+        }
+        // build keypad
+        const pad = document.getElementById('pin-pad');
+        ['1','2','3','4','5','6','7','8','9','','0','del'].forEach(k => {
+            if (k === '') { pad.appendChild(document.createElement('div')); return; }
+            const b = document.createElement('button'); b.className = 'pk';
+            b.innerHTML = k === 'del' ? '<i class="fa-solid fa-delete-left"></i>' : k;
+            b.onclick = () => {
+                if (k === 'del') { pin = pin.slice(0,-1); paintDots(); return; }
+                if (pin.length >= 4) return;
+                pin += k; paintDots();
+                // design-only: any 4 digits pass, shows a brief "verifying" then reveals
+                if (pin.length === 4) setTimeout(() => {
+                    document.getElementById('pin-err').style.color = '#12b886';
+                    document.getElementById('pin-err').textContent = 'Verified ✓';
+                    setTimeout(revealPnr, 450);
+                }, 200);
+            };
+            pad.appendChild(b);
+        });
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Spending Limits</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .info-group{
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+            border-radius:22px; overflow:hidden; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .row-ic{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        /* FA glyphs carry their own baseline metrics — centring the inline box
+           leaves the glyph sitting high. Make the <i> its own centred flex box. */
+        .row-ic > i, .row-ic > svg { display:flex; align-items:center; justify-content:center;
+            width:1em; height:1em; line-height:1; }
+        .ic-blue{ background:rgba(58,107,255,.13); color:#3a6bff; }
+        .ic-green{ background:rgba(18,184,134,.13); color:#12b886; }
+        .ic-orange{ background:rgba(245,158,11,.13); color:#f59e0b; }
+        .ic-purple{ background:rgba(139,92,246,.13); color:#8b5cf6; }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* slider */
+        .lim-slider { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:99px; outline:none;
+            background:rgba(120,140,190,.2); margin:14px 0 6px; }
+        .lim-slider::-webkit-slider-thumb { -webkit-appearance:none; width:24px; height:24px; border-radius:50%; background:#fff;
+            border:2px solid #3a6bff; box-shadow:0 2px 8px rgba(58,107,255,.4); cursor:pointer; transition:transform .15s; }
+        .lim-slider::-webkit-slider-thumb:active { transform:scale(1.2); }
+        .lim-slider::-moz-range-thumb { width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid #3a6bff; cursor:pointer; }
+        .bar { height:7px; border-radius:99px; background:rgba(120,140,190,.18); overflow:hidden; }
+        .bar > span { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#3a6bff,#7a49ff); transition:width .4s cubic-bezier(.34,1.3,.5,1); }
+        .saved { opacity:0; transition:opacity .3s; font-size:10px; font-weight:800; color:#12b886; text-transform:uppercase; letter-spacing:.1em; }
+        .saved.show { opacity:1; }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] .info-group{ background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.07); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+
+    <div class="min-h-screen pb-20">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="profile.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">Spending Limits</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <section class="px-5 space-y-7">
+            <!-- current usage -->
+            <div class="info-group p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">This Month</p>
+                        <p class="text-2xl font-extrabold text-slate-900 mt-1" id="spent">$0</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Limit</p>
+                        <p class="text-lg font-extrabold mt-1" style="color:#3a6bff" id="limit">$0</p>
+                    </div>
+                </div>
+                <div class="bar"><span id="bar" style="width:0%"></span></div>
+                <p class="text-[11px] text-slate-400 font-semibold mt-2" id="pct">0% used</p>
+            </div>
+
+            <!-- monthly limit -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Monthly Limit</h3>
+                    <span class="saved" id="saved-1">Saved</span>
+                </div>
+                <div class="info-group p-5">
+                    <div class="flex items-center gap-4">
+                        <div class="row-ic ic-blue"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="flex-1">
+                            <p class="text-[13px] font-bold text-slate-800">Overall spend cap</p>
+                            <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Card declines past this amount</p>
+                        </div>
+                        <p class="text-[15px] font-extrabold" style="color:#3a6bff" id="lim-val">$50,000</p>
+                    </div>
+                    <input type="range" class="lim-slider" id="lim-range" min="1000" max="100000" step="1000" value="50000">
+                    <div class="flex justify-between text-[9px] font-bold text-slate-400">
+                        <span>$1K</span><span>$100K</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- per-category caps -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Per-Transaction Caps</h3>
+                    <span class="saved" id="saved-2">Saved</span>
+                </div>
+                <div class="info-group" id="caps"></div>
+            </div>
+
+            <!-- ATM -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Daily Withdrawal</h3>
+                <div class="info-group p-5">
+                    <div class="flex items-center gap-4 mb-1">
+                        <div class="row-ic ic-orange"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                        <div class="flex-1">
+                            <p class="text-[13px] font-bold text-slate-800">ATM cash limit</p>
+                            <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Resets at midnight</p>
+                        </div>
+                        <p class="text-[15px] font-extrabold" style="color:#f59e0b" id="atm-val">$1,000</p>
+                    </div>
+                    <input type="range" class="lim-slider" id="atm-range" min="100" max="5000" step="100" value="1000">
+                    <div class="flex justify-between text-[9px] font-bold text-slate-400">
+                        <span>$100</span><span>$5K</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const CAPS = [
+            { key:'capShopping', label:'Shopping',      sub:'Retail & e-commerce', ic:'fa-bag-shopping',   cls:'ic-purple', dflt:2500 },
+            { key:'capFood',     label:'Food & Drink',  sub:'Restaurants, cafes',  ic:'fa-mug-hot',        cls:'ic-green',  dflt:500  },
+            { key:'capTransfer', label:'Transfers',     sub:'Person to person',    ic:'fa-arrow-right-arrow-left', cls:'ic-blue', dflt:10000 },
+        ];
+        const money = n => '$' + n.toLocaleString('en-US');
+        function get(k, d) { const v = NovaPay.state.settings[k]; return v === undefined ? d : v; }
+        function flash(id) { const e = document.getElementById(id); e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 1400); }
+
+        function renderUsage() {
+            const ac = NovaPay.cards().find(c => c.id === NovaPay.state.activeCard) || NovaPay.cards()[0];
+            const spent = ac.spentCents || 0;
+            const lim = get('monthlyLimit', 50000) * 100;
+            const pct = Math.min(100, Math.round(spent / lim * 100));
+            document.getElementById('spent').textContent = NovaPay.fmt(spent);
+            document.getElementById('limit').textContent = NovaPay.fmt(lim);
+            document.getElementById('bar').style.width = pct + '%';
+            document.getElementById('pct').textContent = pct + '% used · ' + ac.name;
+        }
+
+        function renderCaps() {
+            document.getElementById('caps').innerHTML = CAPS.map((c, i) => `
+                <div class="p-4 flex items-center gap-4 ${i < CAPS.length-1 ? 'border-b border-white/40' : ''}">
+                    <div class="row-ic ${c.cls}"><i class="fa-solid ${c.ic}"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[13px] font-bold text-slate-800">${c.label}</p>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">${c.sub}</p>
+                    </div>
+                    <select class="text-[13px] font-extrabold bg-transparent border-none outline-none cursor-pointer" style="color:#3a6bff"
+                            onchange="setCap('${c.key}', this.value)">
+                        ${[100,500,1000,2500,5000,10000,25000].map(v =>
+                            `<option value="${v}" ${get(c.key, c.dflt)==v?'selected':''}>${money(v)}</option>`).join('')}
+                    </select>
+                </div>`).join('');
+        }
+
+        function setCap(key, val) {
+            NovaPay.setSetting(key, Number(val));
+            flash('saved-2');
+            if (navigator.vibrate) navigator.vibrate(10);
+        }
+
+        const limRange = document.getElementById('lim-range');
+        const atmRange = document.getElementById('atm-range');
+
+        limRange.addEventListener('input', e => {
+            document.getElementById('lim-val').textContent = money(Number(e.target.value));
+        });
+        limRange.addEventListener('change', e => {
+            NovaPay.setSetting('monthlyLimit', Number(e.target.value));
+            renderUsage(); flash('saved-1');
+            if (navigator.vibrate) navigator.vibrate(10);
+        });
+        atmRange.addEventListener('input', e => {
+            document.getElementById('atm-val').textContent = money(Number(e.target.value));
+        });
+        atmRange.addEventListener('change', e => {
+            NovaPay.setSetting('atmLimit', Number(e.target.value));
+            if (navigator.vibrate) navigator.vibrate(10);
+        });
+
+        window.onload = function() {
+            const ml = get('monthlyLimit', 50000);
+            limRange.value = ml;
+            document.getElementById('lim-val').textContent = money(ml);
+            const al = get('atmLimit', 1000);
+            atmRange.value = al;
+            document.getElementById('atm-val').textContent = money(al);
+            renderUsage();
+            renderCaps();
+        };
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

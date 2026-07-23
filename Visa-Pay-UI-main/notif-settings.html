@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Notification Settings</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .info-group{
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+            border-radius:22px; overflow:hidden; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .row-ic{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        /* FA glyphs carry their own baseline metrics — centring the inline box
+           leaves the glyph sitting high. Make the <i> its own centred flex box. */
+        .row-ic > i, .row-ic > svg { display:flex; align-items:center; justify-content:center;
+            width:1em; height:1em; line-height:1; }
+        .ic-blue{ background:rgba(58,107,255,.13); color:#3a6bff; }
+        .ic-green{ background:rgba(18,184,134,.13); color:#12b886; }
+        .ic-purple{ background:rgba(139,92,246,.13); color:#8b5cf6; }
+        .ic-orange{ background:rgba(245,158,11,.13); color:#f59e0b; }
+        .ic-red{ background:rgba(240,80,110,.13); color:#f0506e; }
+        .ic-grey{ background:rgba(120,140,190,.1); color:#64748b; }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* same physical switch as profile.html */
+        .tog { width:46px; height:28px; border-radius:999px; background:#e2e8f0; position:relative; border:none; flex-shrink:0;
+            transition:background .25s cubic-bezier(.4,0,.2,1); cursor:pointer; box-shadow:inset 0 1px 3px rgba(15,23,42,.12); }
+        .tog::after { content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff;
+            box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .34s cubic-bezier(.34,1.56,.64,1), width .18s ease, box-shadow .3s; }
+        .tog.on { background:#0052FF; }
+        .tog.on::after { transform:translateX(18px); }
+        .tog:active::after { width:26px; }
+        .tog.on:active::after { transform:translateX(14px); }
+        .tog:disabled { opacity:.4; cursor:not-allowed; }
+        .tog.flash::after { animation:togRing .45s ease-out; }
+        @keyframes togRing {
+            from { box-shadow:0 1px 3px rgba(0,0,0,.2), 0 0 0 0 rgba(0,82,255,.4); }
+            to   { box-shadow:0 1px 3px rgba(0,0,0,.2), 0 0 0 9px rgba(0,82,255,0); }
+        }
+        .set-row { transition:background .25s, opacity .3s; }
+        .set-row.touched { background:rgba(58,107,255,.06); }
+        .muted { opacity:.42; pointer-events:none; }
+
+        .seg { display:flex; gap:6px; }
+        .seg button { flex:1; padding:9px; border:none; border-radius:11px; font-weight:800; font-size:11px; color:#8a93ab;
+            background:rgba(120,140,190,.1); transition:all .2s; cursor:pointer; }
+        .seg button.on { background:#0052FF; color:#fff; box-shadow:0 6px 14px -6px rgba(0,82,255,.5); }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] .info-group{ background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.07); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .tog{ background:#2b3550; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+
+    <div class="min-h-screen pb-20">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="profile.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">Notifications</h1>
+            <a href="notifications.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-inbox text-[13px]"></i>
+            </a>
+        </header>
+
+        <section class="px-5 space-y-7">
+            <!-- master switch -->
+            <div class="info-group">
+                <div class="set-row p-4 flex items-center justify-between" data-row>
+                    <div class="flex items-center gap-4">
+                        <div class="row-ic ic-blue"><i class="fa-solid fa-bell"></i></div>
+                        <div>
+                            <span class="text-[13px] font-bold text-slate-800">Allow Notifications</span>
+                            <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Master switch for everything below</p>
+                        </div>
+                    </div>
+                    <button id="tog-master" class="tog" onclick="toggle('notifications')"></button>
+                </div>
+            </div>
+
+            <!-- delivery -->
+            <div class="space-y-3" id="grp-delivery">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Delivery</h3>
+                <div class="info-group">
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-purple"><i class="fa-solid fa-mobile-screen"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Push</span>
+                        </div>
+                        <button id="tog-push" class="tog" onclick="toggle('notifPush')"></button>
+                    </div>
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-green"><i class="fa-solid fa-comment-sms"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">SMS</span>
+                        </div>
+                        <button id="tog-sms" class="tog" onclick="toggle('notifSms')"></button>
+                    </div>
+                    <div class="set-row p-4 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-orange"><i class="fa-solid fa-envelope"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Email</span>
+                        </div>
+                        <button id="tog-email" class="tog" onclick="toggle('notifEmail')"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- what you get told about -->
+            <div class="space-y-3" id="grp-types">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Alert Me About</h3>
+                <div class="info-group">
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div>
+                                <span class="text-[13px] font-bold text-slate-800">Suspicious Activity</span>
+                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Always recommended</p>
+                            </div>
+                        </div>
+                        <button id="tog-susp" class="tog" onclick="toggle('notifSuspicious')"></button>
+                    </div>
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-blue"><i class="fa-solid fa-receipt"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Every Purchase</span>
+                        </div>
+                        <button id="tog-purch" class="tog" onclick="toggle('notifPurchases')"></button>
+                    </div>
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-green"><i class="fa-solid fa-arrow-down"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Money Received</span>
+                        </div>
+                        <button id="tog-recv" class="tog" onclick="toggle('notifReceived')"></button>
+                    </div>
+                    <div class="set-row p-4 border-b border-white/40 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-purple"><i class="fa-solid fa-gift"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Gifts & Rewards</span>
+                        </div>
+                        <button id="tog-gifts" class="tog" onclick="toggle('notifGifts')"></button>
+                    </div>
+                    <div class="set-row p-4 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-grey"><i class="fa-solid fa-bullhorn"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Offers & Promotions</span>
+                        </div>
+                        <button id="tog-promo" class="tog" onclick="toggle('notifPromos')"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- threshold -->
+            <div class="space-y-3" id="grp-thresh">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Only Alert Above</h3>
+                <div class="info-group p-4">
+                    <div class="seg" id="thresh">
+                        <button data-v="0">Any</button>
+                        <button data-v="2500">$25</button>
+                        <button data-v="10000">$100</button>
+                        <button data-v="50000">$500</button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-3 text-center" id="thresh-lbl"></p>
+                </div>
+            </div>
+
+            <!-- quiet hours -->
+            <div class="space-y-3" id="grp-quiet">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Quiet Hours</h3>
+                <div class="info-group">
+                    <div class="set-row p-4 flex items-center justify-between" data-row>
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-purple"><i class="fa-solid fa-moon"></i></div>
+                            <div>
+                                <span class="text-[13px] font-bold text-slate-800">Mute 10pm – 8am</span>
+                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Fraud alerts still come through</p>
+                            </div>
+                        </div>
+                        <button id="tog-quiet" class="tog" onclick="toggle('notifQuiet')"></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const TOGGLES = {
+            'tog-master': ['notifications',     true],
+            'tog-push':   ['notifPush',         true],
+            'tog-sms':    ['notifSms',          false],
+            'tog-email':  ['notifEmail',        true],
+            'tog-susp':   ['notifSuspicious',   true],
+            'tog-purch':  ['notifPurchases',    true],
+            'tog-recv':   ['notifReceived',     true],
+            'tog-gifts':  ['notifGifts',        true],
+            'tog-promo':  ['notifPromos',       false],
+            'tog-quiet':  ['notifQuiet',        true],
+        };
+        const dflt = key => (Object.values(TOGGLES).find(t => t[0] === key) || [, false])[1];
+        const get = key => { const v = NovaPay.state.settings[key]; return v === undefined ? dflt(key) : v; };
+
+        function render() {
+            for (const [id, [key, d]] of Object.entries(TOGGLES)) {
+                const v = NovaPay.state.settings[key];
+                document.getElementById(id).classList.toggle('on', !!(v === undefined ? d : v));
+            }
+            // master off => everything else greys out, like iOS
+            const on = get('notifications');
+            ['grp-delivery','grp-types','grp-thresh','grp-quiet'].forEach(g =>
+                document.getElementById(g).classList.toggle('muted', !on));
+
+            const t = get('notifThreshold');
+            document.querySelectorAll('#thresh button').forEach(b =>
+                b.classList.toggle('on', Number(b.dataset.v) === (t === undefined ? 0 : t)));
+            document.getElementById('thresh-lbl').textContent = !t
+                ? 'You are alerted for every transaction'
+                : 'Only transactions over ' + NovaPay.fmt(t) + ' trigger an alert';
+        }
+
+        function toggle(key) {
+            const el = document.querySelector(`[onclick="toggle('${key}')"]`);
+            const now = !get(key);
+            NovaPay.setSetting(key, now);
+            if (now && el) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 460); }
+            const row = el && el.closest('[data-row]');
+            if (row) { row.classList.add('touched'); setTimeout(() => row.classList.remove('touched'), 260); }
+            if (navigator.vibrate) navigator.vibrate(now ? 12 : 8);
+            render();
+        }
+
+        document.querySelectorAll('#thresh button').forEach(b => b.onclick = () => {
+            NovaPay.setSetting('notifThreshold', Number(b.dataset.v));
+            if (navigator.vibrate) navigator.vibrate(10);
+            render();
+        });
+
+        window.addEventListener('novapay:change', () => { NovaPay.reload(); render(); });
+        window.onload = render;
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Visa AI Analytics</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            margin: 0;
+            padding-bottom: 120px;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ambient wash behind the glass — keeps the navy, gives the blur something to bend */
+        .stat-bg { position:fixed; inset:0; z-index:-1; overflow:hidden; background:#0f172a; }
+        .stat-bg::before{ content:""; position:absolute; width:85vw; height:85vw; top:-30vw; left:-25vw; border-radius:50%;
+            background:radial-gradient(circle,#1d4ed8,transparent 66%); opacity:.5; filter:blur(60px); }
+        .stat-bg::after{ content:""; position:absolute; width:75vw; height:75vw; bottom:-28vw; right:-22vw; border-radius:50%;
+            background:radial-gradient(circle,#7928CA,transparent 66%); opacity:.36; filter:blur(60px); }
+
+        /* --- LIQUID GLASS (dark) --- */
+        .glass {
+            background: rgba(255,255,255,.055);
+            backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+            border: 1px solid rgba(255,255,255,.11);
+            box-shadow: 0 18px 44px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.14);
+            border-radius: 24px;
+        }
+        .spring { transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+        .spring:active { transform: scale(.97); }
+
+        /* --- GRAPH --- */
+        .chart-container { position: relative; height: 210px; width: 100%; }
+        .chart-svg { width: 100%; height: 100%; display:block; overflow: visible; }
+        .chart-line {
+            fill: none; stroke: url(#lineGrad); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 1200; stroke-dashoffset: 1200;
+            animation: drawLine 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            filter: drop-shadow(0 0 6px rgba(59,130,246,.5));
+        }
+        .chart-fill { fill: url(#gradientBlue); opacity: 0; animation: fadeIn 1.2s ease-out .8s forwards; }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        .grid-line { stroke: rgba(255,255,255,.06); stroke-width: 1; }
+        .x-lbl { fill:#64748b; font-size:9px; font-weight:700; letter-spacing:.06em; }
+        .dot { fill:#0f172a; stroke:#3b82f6; stroke-width:2.5; opacity:0; animation:pop .45s ease-out forwards; }
+        .dot-live { fill:#60a5fa; stroke:#bfdbfe; }
+        @keyframes pop { to { opacity:1; } }
+
+        /* range selector */
+        .seg { display:flex; gap:5px; padding:4px; border-radius:14px;
+            background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); }
+        .seg button { flex:1; padding:8px 0; border:none; border-radius:10px; font-size:11px; font-weight:800;
+            color:#64748b; background:transparent; transition:all .25s; cursor:pointer; }
+        .seg button.on { background:rgba(59,130,246,.9); color:#fff; box-shadow:0 6px 16px -6px rgba(59,130,246,.7); }
+
+        /* --- WRAPPED CARDS (Financial Rewind) --- */
+        @keyframes sheen { 0%,100%{transform:translateX(-60%);} 50%{transform:translateX(60%);} }
+        .wrapped-scroll { display: flex; gap: 16px; overflow-x: auto; padding: 10px 24px 30px; scroll-snap-type: x mandatory; }
+        .wrapped-card {
+            min-width: 260px; height: 320px; border-radius: 32px;
+            scroll-snap-align: center; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.2s;
+        }
+        .wrapped-card:active { transform: scale(0.98); }
+        .wc-1 { background: linear-gradient(135deg, #FF0080, #7928CA); }
+        .wc-2 { background: linear-gradient(135deg, #007CF0, #00DFD8); }
+        .wc-3 { background: linear-gradient(135deg, #FF4D4D, #F9CB28); }
+        .wc-4 { background: linear-gradient(135deg, #434343, #000000); }
+        /* clamp so 6-figure amounts don't run off the card edge */
+        .big-stat { font-family: 'Space Grotesk', sans-serif; font-weight: 700; line-height: 1;
+            font-size: clamp(1.6rem, 8.5vw, 2.5rem); white-space: nowrap; letter-spacing: -0.02em; }
+
+        /* --- WIDGETS --- */
+        .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 24px 24px; }
+        .stat-widget {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px; padding: 16px;
+            display: flex; flex-direction: column; justify-content: space-between; height: 140px;
+        }
+        .w-ic { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+        .w-ic > i { display:flex; align-items:center; justify-content:center; width:1em; height:1em; line-height:1; }
+
+        /* nav: dark variant of the shared .nv-nav from theme.css */
+        .nv-nav-bar{ background:rgba(30,41,59,.75) !important; border:1px solid rgba(255,255,255,.11) !important;
+            backdrop-filter:blur(24px) saturate(150%); -webkit-backdrop-filter:blur(24px) saturate(150%); }
+        .nv-item{ color:#64748b; } .nv-item.on{ color:#60a5fa; }
+        .nv-fab{ background:linear-gradient(135deg,#0052FF 0%,#002D8F 100%); box-shadow:0 12px 30px rgba(0,82,255,.45); }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .cards-scroll::-webkit-scrollbar, .wrapped-scroll::-webkit-scrollbar { display:none; }
+
+        /* --- GHOST LOADER --- */
+        #ghost-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background-color: #0f172a; padding: 24px;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .loaded #ghost-overlay { opacity: 0; visibility: hidden; pointer-events: none; }
+        .ghost-block { background: rgba(255,255,255,.06); border-radius: 16px; position: relative; overflow: hidden; }
+        .ghost-block::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    </style>
+</head>
+<body>
+    <div class="stat-bg"></div>
+
+    <!-- GHOST LOADER -->
+    <div id="ghost-overlay">
+        <div class="flex justify-between items-center"><div class="ghost-block w-32 h-8"></div><div class="ghost-block w-10 h-10 rounded-full"></div></div>
+        <div class="ghost-block w-full h-[270px] rounded-3xl"></div>
+        <div class="ghost-block w-full h-[46px] rounded-2xl"></div>
+        <div class="flex gap-3 overflow-hidden"><div class="ghost-block w-[200px] h-[118px] rounded-[20px] shrink-0"></div><div class="ghost-block w-[200px] h-[118px] rounded-[20px] shrink-0"></div></div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="p-6 flex justify-between items-center">
+        <div>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Financial Pulse</p>
+            <h1 class="text-2xl font-bold text-white" id="hdr-month">—</h1>
+        </div>
+        <a href="unavailable.html" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 spring">
+            <i class="fa-solid fa-robot text-blue-400"></i>
+        </a>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="px-6 mb-4">
+        <div class="glass p-4">
+            <div class="flex justify-between items-start mb-1">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">This Month</p>
+                    <p class="text-xl font-extrabold text-white mt-0.5" id="chart-total">$0</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">vs last month</p>
+                    <p class="text-[13px] font-extrabold mt-0.5" id="chart-trend">—</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <svg class="chart-svg" id="chart" viewBox="0 0 340 200" preserveAspectRatio="none"></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- RANGE OPTIONS -->
+    <div class="px-6 mb-7">
+        <div class="seg" id="range">
+            <button data-r="6">6M</button>
+            <button data-r="12">1Y</button>
+            <button data-r="24" class="on">2Y</button>
+        </div>
+    </div>
+
+    <!-- REWIND -->
+    <div class="px-6 mb-4 flex justify-between items-end">
+        <h3 class="text-lg font-bold text-white">Financial Rewind</h3>
+        <span class="text-xs text-slate-400">Since Jun 2026</span>
+    </div>
+
+    <div class="wrapped-scroll hide-scrollbar">
+        <div class="wrapped-card wc-1">
+            <div>
+                <div class="bg-black/20 w-fit px-3 py-1 rounded-full text-[10px] font-bold text-white mb-2">2026 SO FAR</div>
+                <h2 class="text-2xl font-bold text-white">Net Positive.</h2>
+            </div>
+            <div>
+                <p class="text-white/80 text-sm font-medium mb-1">Net Cashflow</p>
+                <p class="big-stat text-white" id="wc-net">—</p>
+                <p class="text-white/60 text-xs mt-2" id="wc-net-sub">—</p>
+            </div>
+        </div>
+
+        <div class="wrapped-card wc-2">
+            <div>
+                <div class="bg-black/20 w-fit px-3 py-1 rounded-full text-[10px] font-bold text-white mb-2">TOP CONNECTION</div>
+                <div class="flex items-center gap-3">
+                    <img id="wc-friend-img" class="w-14 h-14 rounded-full border-4 border-white/25 object-cover shrink-0" alt="">
+                    <h2 class="text-2xl font-bold text-white" id="wc-friend">—</h2>
+                </div>
+            </div>
+            <div>
+                <p class="text-white/80 text-sm font-medium mb-1">Moved between you</p>
+                <p class="big-stat text-white" id="wc-friend-amt">—</p>
+                <p class="text-white/60 text-xs mt-2" id="wc-friend-sub">—</p>
+            </div>
+        </div>
+
+        <div class="wrapped-card wc-3">
+            <div>
+                <div class="bg-black/20 w-fit px-3 py-1 rounded-full text-[10px] font-bold text-white mb-2">WHO YOU PAID</div>
+                <h2 class="text-2xl font-bold text-white">Inner Circle.</h2>
+                <div class="flex -space-x-3 mt-3" id="wc-faces"></div>
+            </div>
+            <div>
+                <p class="text-white/80 text-sm font-medium mb-1">Biggest category · <span id="wc-cat">—</span></p>
+                <p class="big-stat text-white" id="wc-cat-amt">—</p>
+                <p class="text-white/60 text-xs mt-2" id="wc-cat-sub">—</p>
+            </div>
+        </div>
+
+        <div class="wrapped-card wc-4">
+            <div>
+                <div class="bg-white/10 w-fit px-3 py-1 rounded-full text-[10px] font-bold text-white mb-2">REWARDS</div>
+                <h2 class="text-2xl font-bold text-white">Points Bank.</h2>
+            </div>
+            <div>
+                <p class="text-white/80 text-sm font-medium mb-1">Balance</p>
+                <p class="big-stat text-white" id="wc-pts">—</p>
+                <p class="text-white/60 text-xs mt-2" id="wc-pts-sub">—</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIDGETS -->
+    <div class="px-6 mb-3"><h3 class="text-[15px] font-bold text-white">At a Glance</h3></div>
+    <div class="widget-grid" id="widgets"></div>
+
+    <!-- DEEP ANALYTICS -->
+    <div class="px-6 mb-3"><h3 class="text-[15px] font-bold text-white">AI Analytics</h3></div>
+
+    <!-- AI can't infer behavioural patterns from six weeks of data — say so plainly -->
+    <div class="px-6 mb-4">
+        <div class="glass p-4 flex gap-3.5" style="border-color:rgba(96,165,250,.25)">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(96,165,250,.15);color:#60a5fa">
+                <i class="fa-solid fa-robot text-[15px]"></i>
+            </div>
+            <div>
+                <p class="text-[13px] font-bold text-white mb-1">Welcome back — your account was dormant</p>
+                <p class="text-[11px] text-slate-400 leading-relaxed" id="ai-note">
+                    This account is 4 years old, but sat inactive for about a year until June 2026.
+                    Insights built on recent behaviour are still catching up on your renewed activity.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- only the tiles that can be computed from what actually exists -->
+    <div class="widget-grid">
+        <div class="stat-widget">
+            <div class="flex justify-between text-slate-400 text-xl">
+                <i class="fa-solid fa-wallet"></i>
+                <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded font-bold">Verified</span>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400">Available Balance</p>
+                <p class="text-xl font-bold text-white" id="da-bal">—</p>
+                <p class="text-[9px] text-slate-500">Across linked accounts</p>
+            </div>
+        </div>
+        <div class="stat-widget">
+            <div class="flex justify-between text-slate-400 text-xl"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div>
+                <p class="text-xs text-slate-400">Tax Estimate</p>
+                <p class="text-xl font-bold text-white" id="tax-est">—</p>
+                <p class="text-[9px] text-slate-500" id="tax-sub">Based on inflow</p>
+            </div>
+        </div>
+        <div class="stat-widget">
+            <div class="flex justify-between text-slate-400 text-xl"><i class="fa-solid fa-star text-purple-400"></i></div>
+            <div>
+                <p class="text-xs text-slate-400">Reward Points</p>
+                <p class="text-xl font-bold text-white" id="da-pts">—</p>
+                <p class="text-[9px] text-slate-500" id="da-tier">—</p>
+            </div>
+        </div>
+        <div class="stat-widget">
+            <div class="flex justify-between text-slate-400 text-xl"><i class="fa-solid fa-arrow-right-arrow-left text-cyan-400"></i></div>
+            <div>
+                <p class="text-xs text-slate-400">Transactions</p>
+                <p class="text-xl font-bold text-white" id="da-tx">—</p>
+                <p class="text-[9px] text-slate-500">Since you joined</p>
+            </div>
+        </div>
+
+        <!-- stalled by the dormant gap, not missing history — say that honestly -->
+        <div class="stat-widget" style="opacity:.55">
+            <div class="flex justify-between text-slate-500 text-xl">
+                <i class="fa-solid fa-champagne-glasses"></i>
+                <i class="fa-solid fa-hourglass-half text-[11px]"></i>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400">Weekend Vibe</p>
+                <p class="text-sm font-bold text-slate-500">Recalibrating</p>
+                <p class="text-[9px] text-slate-600">Paused during dormancy</p>
+            </div>
+        </div>
+        <div class="stat-widget" style="opacity:.55">
+            <div class="flex justify-between text-slate-500 text-xl">
+                <i class="fa-solid fa-moon"></i>
+                <i class="fa-solid fa-hourglass-half text-[11px]"></i>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400">Spending Rhythm</p>
+                <p class="text-sm font-bold text-slate-500">Recalibrating</p>
+                <p class="text-[9px] text-slate-600">Resumed Jun 2026</p>
+            </div>
+        </div>
+        <div class="stat-widget" style="opacity:.55">
+            <div class="flex justify-between text-slate-500 text-xl">
+                <i class="fa-solid fa-trash-can"></i>
+                <i class="fa-solid fa-hourglass-half text-[11px]"></i>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400">Ghost Subs</p>
+                <p class="text-sm font-bold text-slate-500">Re-scanning</p>
+                <p class="text-[9px] text-slate-600">Subs lapsed while away</p>
+            </div>
+        </div>
+        <div class="stat-widget">
+            <div class="flex justify-between text-slate-400 text-xl">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-down text-[8px]"></i>42
+                </span>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400">Credit Score</p>
+                <p class="text-2xl font-bold text-white">680</p>
+                <p class="text-[9px] text-red-400">Dropped during dormancy</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="px-6 mb-24">
+        <a href="offers.html" class="glass spring p-5 flex items-center gap-4"
+           style="background:linear-gradient(120deg,rgba(49,46,129,.6),rgba(30,58,138,.5))">
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg flex-shrink-0">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="min-w-0">
+                <h4 class="font-bold text-white text-sm">Portfolio Vacuum</h4>
+                <p class="text-xs text-indigo-200" id="vac-sub">Inflation is eating your cash.</p>
+            </div>
+            <i class="fa-solid fa-chevron-right text-white/50 text-sm ml-auto flex-shrink-0"></i>
+        </a>
+    </div>
+
+    <!-- NAV -->
+    <div class="nv-nav"><div class="nv-nav-bar">
+        <a href="home.html" class="nv-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="cards.html" class="nv-item"><i class="fa-solid fa-credit-card"></i><span>Cards</span></a>
+        <a href="pay.html" class="nv-fab"><i class="fa-solid fa-qrcode"></i></a>
+        <a href="stats.html" class="nv-item on"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
+        <a href="user.html" class="nv-item"><i class="fa-solid fa-user"></i><span>User</span></a>
+    </div></div>
+
+    <script>
+        const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        // The account's real story has two active spells with a dormant valley between:
+        //   • active through Jun 2025 (early spend history)
+        //   • flat/quiet Jul 2025 – May 2026 (dormant)
+        //   • active again from Jun 2026, driven by the real seeded transactions
+        // Seeded transactions only cover the recent spell, so the earlier spend is
+        // synthesised; the current spell reads live from NovaPay.transactions().
+        const ACTIVE_END   = new Date(2025, 5, 30).getTime();   // spikes run until end of Jun 2025
+        const REVIVE_START = new Date(2026, 5, 1).getTime();    // active again from Jun 2026
+        const BASELINE = 34000;                                 // cents — the dormant flat line
+        const EARLY_PEAK = 340000;                              // ~$3,400, the top of the Jun-25 era
+        const REVIVE_PEAK = Math.round(EARLY_PEAK / 2);         // Jun-26 spell tops out at ~half that
+
+        // deterministic pseudo-spend for the early active months (no Math.random, so it's stable)
+        function earlySpend(d) {
+            const seed = d.getFullYear() * 12 + d.getMonth();
+            const wave = Math.sin(seed * 1.7) * Math.cos(seed * 0.9);   // -1..1, jagged
+            return Math.round(210000 + wave * 120000 + (seed % 5) * 24000);  // ~$900–$3,600
+        }
+
+        function monthlySpend(months) {
+            const now = new Date();
+            const out = [];
+            for (let i = months - 1; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const next = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+                let cents;
+                if (d.getTime() <= ACTIVE_END) {
+                    cents = earlySpend(d);                                   // early active spikes
+                } else if (d.getTime() < REVIVE_START) {
+                    cents = BASELINE + ((i * 37) % 5) * 300;                // dormant valley — flat
+                } else {
+                    const raw = NovaPay.transactions()                      // live current spell
+                        .filter(t => t.amountCents < 0 && t.ts >= d.getTime() && t.ts < next.getTime())
+                        .reduce((s, t) => s + Math.abs(t.amountCents), 0);
+                    // The revived spell tops out at ~half the early-active era. Raw seeded
+                    // spend is transfer-heavy and dwarfs it, so cap the plotted line at
+                    // REVIVE_PEAK and give the first revival month a soft ramp.
+                    cents = raw === 0 ? Math.round(REVIVE_PEAK * 0.55) : Math.min(raw, REVIVE_PEAK);
+                }
+                out.push({ label: MONTHS[d.getMonth()] + " '" + String(d.getFullYear()).slice(2), cents });
+            }
+            return out;
+        }
+
+        // Catmull-Rom -> cubic bezier: smooth through every point, no wild overshoot
+        function smoothPath(pts) {
+            if (pts.length < 2) return '';
+            let d = `M${pts[0].x},${pts[0].y}`;
+            for (let i = 0; i < pts.length - 1; i++) {
+                const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || p2;
+                d += ` C${p1.x+(p2.x-p0.x)/6},${p1.y+(p2.y-p0.y)/6} ${p2.x-(p3.x-p1.x)/6},${p2.y-(p3.y-p1.y)/6} ${p2.x},${p2.y}`;
+            }
+            return d;
+        }
+
+        function drawChart(months) {
+            const data = monthlySpend(months);
+            const W = 340, H = 200, PL = 8, PR = 8, PT = 20, PB = 26;
+            const iw = W - PL - PR, ih = H - PT - PB;
+            const max = Math.max(...data.map(p => p.cents)) * 1.2 || 1;
+
+            const pts = data.map((p, i) => ({
+                x: PL + (data.length === 1 ? iw/2 : (i / (data.length - 1)) * iw),
+                y: PT + ih - (p.cents / max) * ih,
+                label: p.label
+            }));
+
+            const line = smoothPath(pts);
+            const fill = line + ` L${pts[pts.length-1].x},${PT+ih} L${pts[0].x},${PT+ih} Z`;
+            const grid = [0, .5, 1].map(f =>
+                `<line class="grid-line" x1="${PL}" y1="${PT+ih*f}" x2="${W-PR}" y2="${PT+ih*f}"/>`).join('');
+
+            // never more than 5 labels on the x-axis, however many months are plotted
+            const want = Math.min(5, pts.length);
+            const keep = new Set();
+            for (let k = 0; k < want; k++) keep.add(Math.round(k * (pts.length - 1) / (want - 1 || 1)));
+
+            const labels = [...keep].sort((a,b)=>a-b).map(i => {
+                const p = pts[i];
+                const anchor = i === 0 ? 'start' : i === pts.length-1 ? 'end' : 'middle';
+                return `<text class="x-lbl" x="${p.x}" y="${H-8}" text-anchor="${anchor}">${p.label.toUpperCase()}</text>`;
+            }).join('');
+
+            const dots = [...keep].sort((a,b)=>a-b).map(i =>
+                `<circle class="dot ${i===pts.length-1?'dot-live':''}" cx="${pts[i].x}" cy="${pts[i].y}" r="3.5"
+                         style="animation-delay:${1.3 + i*0.04}s"/>`).join('');
+
+            document.getElementById('chart').innerHTML = `
+                <defs>
+                    <linearGradient id="gradientBlue" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0%" stop-color="#1d4ed8"/>
+                        <stop offset="100%" stop-color="#60a5fa"/>
+                    </linearGradient>
+                </defs>
+                ${grid}
+                <path class="chart-fill" d="${fill}"/>
+                <path class="chart-line" d="${line}"/>
+                ${dots}${labels}`;
+
+            // header describes the LATEST month, not the whole plotted span — a 24-month
+            // sum reads like you spent it all this month, which contradicts "new since June"
+            const last = data[data.length-1].cents;
+            const prev = data.length > 1 ? data[data.length-2].cents : 0;
+            document.getElementById('chart-total').textContent = NovaPay.fmt(last);
+
+            const el = document.getElementById('chart-trend');
+            if (!prev) { el.textContent = '—'; el.style.color = '#64748b'; return; }
+            const pct = Math.round((last - prev) / prev * 100);
+            const up = pct >= 0;
+            el.innerHTML = `<i class="fa-solid fa-arrow-${up?'up':'down'} text-[10px]"></i> ${Math.abs(pct)}%`;
+            el.style.color = up ? '#f0506e' : '#12b886';   // spending up is the bad direction
+        }
+
+        // the AI-analytics tiles that can be grounded in real data (the rest are honestly locked)
+        function renderAnalytics() {
+            const inflow = NovaPay.transactions().filter(t => t.amountCents > 0).reduce((s, t) => s + t.amountCents, 0);
+            const est = Math.round(inflow * 0.22);   // ~22% effective
+            document.getElementById('tax-est').textContent = NovaPay.fmt(est);
+            document.getElementById('tax-sub').textContent = 'Based on ' + NovaPay.fmt(inflow) + ' inflow';
+
+            document.getElementById('da-bal').textContent = NovaPay.fmt(NovaPay.balanceCents);
+
+            const r = NovaPay.rewards();
+            document.getElementById('da-pts').textContent = (r.pointsBalance || 0).toLocaleString();
+            document.getElementById('da-tier').textContent = (r.tier || 'Member') + ' tier';
+
+            document.getElementById('da-tx').textContent = NovaPay.transactions().length;
+        }
+
+        function renderWidgets() {
+            const tx = NovaPay.transactions(), now = Date.now(), mo = 30*86400000;
+            const spend  = tx.filter(t => t.amountCents<0 && t.ts>=now-mo).reduce((s,t)=>s+Math.abs(t.amountCents),0);
+            const income = tx.filter(t => t.amountCents>0 && t.ts>=now-mo).reduce((s,t)=>s+t.amountCents,0);
+            const biggest = tx.filter(t=>t.amountCents<0).sort((a,b)=>a.amountCents-b.amountCents)[0];
+            const r = NovaPay.rewards();
+
+            document.getElementById('widgets').innerHTML = `
+                <div class="stat-widget">
+                    <div class="w-ic" style="background:rgba(18,184,134,.15);color:#12b886"><i class="fa-solid fa-arrow-down text-[13px]"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">In · 30d</p>
+                        <p class="text-[19px] font-extrabold text-white mt-1">${NovaPay.fmt(income)}</p>
+                    </div>
+                </div>
+                <div class="stat-widget">
+                    <div class="w-ic" style="background:rgba(240,80,110,.15);color:#f0506e"><i class="fa-solid fa-arrow-up text-[13px]"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Out · 30d</p>
+                        <p class="text-[19px] font-extrabold text-white mt-1">${NovaPay.fmt(spend)}</p>
+                    </div>
+                </div>
+                <div class="stat-widget">
+                    <div class="w-ic" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fa-solid fa-receipt text-[13px]"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Largest</p>
+                        <p class="text-[19px] font-extrabold text-white mt-1">${biggest?NovaPay.fmt(Math.abs(biggest.amountCents)):'—'}</p>
+                        <p class="text-[9px] text-slate-500 font-semibold mt-0.5 truncate">${biggest?biggest.name:''}</p>
+                    </div>
+                </div>
+                <div class="stat-widget">
+                    <div class="w-ic" style="background:rgba(168,85,247,.15);color:#a855f7"><i class="fa-solid fa-star text-[13px]"></i></div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Points</p>
+                        <p class="text-[19px] font-extrabold text-white mt-1">${(r.pointsBalance||0).toLocaleString()}</p>
+                        <p class="text-[9px] text-slate-500 font-semibold mt-0.5">${r.tier||''}</p>
+                    </div>
+                </div>`;
+        }
+
+        function renderRewind() {
+            // usage only began Jun 2026, so the "rewind" is this-year-so-far, not a 3-yr look-back
+            const SINCE = new Date(2026, 5, 1).getTime();
+            const tx = NovaPay.transactions().filter(t => t.ts >= SINCE);
+            const income = tx.filter(t=>t.amountCents>0).reduce((s,t)=>s+t.amountCents,0);
+            const spend  = tx.filter(t=>t.amountCents<0).reduce((s,t)=>s+Math.abs(t.amountCents),0);
+            const net = income - spend;
+            document.getElementById('wc-net').textContent = (net>=0?'+':'-') + NovaPay.fmt(Math.abs(net));
+            document.getElementById('wc-net-sub').textContent = income
+                ? `Kept ${Math.round(net/income*100)}% since you joined.` : 'No income recorded yet.';
+
+            const names = {};
+            NovaPay.contacts().forEach(c => names[c.name] = 0);
+            tx.forEach(t => { if (names[t.name] !== undefined) names[t.name] += Math.abs(t.amountCents); });
+            const top = Object.entries(names).sort((a,b)=>b[1]-a[1])[0];
+            const has = top && top[1];
+            document.getElementById('wc-friend').textContent = has ? top[0] : '—';
+            document.getElementById('wc-friend-amt').textContent = has ? NovaPay.fmt(top[1]) : '—';
+            document.getElementById('wc-friend-sub').textContent = has ? 'Your most active connection.' : 'No transfers yet.';
+
+            const img = document.getElementById('wc-friend-img');
+            const c = has ? NovaPay.contacts().find(x => x.name === top[0]) : null;
+            if (c && c.img) {
+                img.src = c.img;
+                img.style.display = '';
+                // fall back to an initials avatar if the photo can't load
+                img.onerror = () => { img.src = 'https://ui-avatars.com/api/?background=fff&color=007CF0&bold=true&name=' + encodeURIComponent(top[0]); };
+            } else if (has) {
+                img.src = 'https://ui-avatars.com/api/?background=fff&color=007CF0&bold=true&name=' + encodeURIComponent(top[0]);
+                img.style.display = '';
+            } else {
+                img.style.display = 'none';
+            }
+
+            // biggest category since joining (well inside the ~2 months of real data)
+            const c0 = NovaPay.insights(90).rows[0];
+            document.getElementById('wc-cat').textContent = c0 ? c0.category : '—';
+            document.getElementById('wc-cat-amt').textContent = c0 ? NovaPay.fmt(c0.cents) : '—';
+            document.getElementById('wc-cat-sub').textContent = c0 ? `${c0.pct}% of your spending.` : '';
+
+            // faces: everyone you've actually moved money with, ranked, with initials fallback
+            const paid = Object.entries(names).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
+            document.getElementById('wc-faces').innerHTML = paid.map(([name]) => {
+                const ct = NovaPay.contacts().find(x => x.name === name);
+                const fallback = 'https://ui-avatars.com/api/?background=fff&color=FF4D4D&bold=true&name=' + encodeURIComponent(name);
+                const src = ct && ct.img ? ct.img : fallback;
+                return `<img class="w-10 h-10 rounded-full border-2 border-white object-cover shrink-0"
+                             src="${src}" alt="${name}" title="${name}"
+                             onerror="this.onerror=null;this.src='${fallback}'">`;
+            }).join('');
+
+            const r = NovaPay.rewards();
+            document.getElementById('wc-pts').textContent = (r.pointsBalance||0).toLocaleString();
+            document.getElementById('wc-pts-sub').textContent =
+                `${r.tier || 'Member'} · ${NovaPay.fmt(r.cashbackCents||0)} cashback ready.`;
+        }
+
+        let range = 24;
+        document.querySelectorAll('#range button').forEach(b => b.onclick = () => {
+            range = Number(b.dataset.r);
+            document.querySelectorAll('#range button').forEach(x => x.classList.toggle('on', x === b));
+            if (navigator.vibrate) navigator.vibrate(10);
+            drawChart(range);
+        });
+
+        function renderAll() {
+            const now = new Date();
+            document.getElementById('hdr-month').textContent = MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+            drawChart(range);
+            renderAnalytics();
+            renderWidgets();
+            renderRewind();
+        }
+
+        window.addEventListener('novapay:change', () => { NovaPay.reload(); renderAll(); });
+        window.onload = function() {
+            renderAll();
+            setTimeout(() => document.body.classList.add('loaded'), 900);
+        };
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

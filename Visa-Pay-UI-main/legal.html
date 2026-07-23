@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Terms &amp; Privacy</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .info-group{
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+            border-radius:22px; overflow:hidden; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .row-ic{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        /* FA glyphs carry their own baseline metrics — centring the inline box
+           leaves the glyph sitting high. Make the <i> its own centred flex box. */
+        .row-ic > i, .row-ic > svg { display:flex; align-items:center; justify-content:center;
+            width:1em; height:1em; line-height:1; }
+        .ic-blue{ background:rgba(58,107,255,.13); color:#3a6bff; }
+        .ic-green{ background:rgba(18,184,134,.13); color:#12b886; }
+        .ic-purple{ background:rgba(139,92,246,.13); color:#8b5cf6; }
+        .ic-orange{ background:rgba(245,158,11,.13); color:#f59e0b; }
+        .ic-grey{ background:rgba(120,140,190,.1); color:#64748b; }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* segmented tabs */
+        .tabs { display:flex; gap:6px; padding:5px; border-radius:16px;
+            background:rgba(255,255,255,.35); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
+            border:1px solid rgba(255,255,255,.6); }
+        .tabs button { flex:1; padding:10px; border:none; border-radius:12px; font-weight:800; font-size:12px;
+            color:#8a93ab; background:transparent; transition:all .25s; cursor:pointer; }
+        .tabs button.on { background:#0052FF; color:#fff; box-shadow:0 6px 16px -6px rgba(0,82,255,.5); }
+
+        /* accordion doc sections */
+        .sec + .sec { border-top:1px solid rgba(120,140,190,.14); }
+        .sec-h { width:100%; text-align:left; background:none; border:none; padding:15px 16px;
+            display:flex; align-items:center; gap:12px; cursor:pointer; }
+        .sec-h .n { width:22px; height:22px; border-radius:7px; flex-shrink:0; font-size:10px; font-weight:800;
+            display:flex; align-items:center; justify-content:center; background:rgba(58,107,255,.12); color:#3a6bff; }
+        .sec-h span.t { flex:1; font-size:13px; font-weight:700; color:#0f172a; }
+        .sec-h i { font-size:11px; color:#8a93ab; transition:transform .3s; }
+        .sec.open .sec-h i { transform:rotate(180deg); }
+        .sec-b { max-height:0; overflow:hidden; transition:max-height .4s cubic-bezier(.4,0,.2,1); }
+        .sec.open .sec-b { max-height:600px; }
+        .sec-b p { font-size:11.5px; line-height:1.7; color:#8a93ab; font-weight:500; padding:0 16px 15px 50px; margin:0; }
+        .sec-b p + p { padding-top:0; }
+
+        .pill { display:inline-block; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+            padding:3px 9px; border-radius:99px; background:rgba(18,184,134,.15); color:#12b886; }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] .info-group{ background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.07); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .sec-h span.t{ color:#eaf0ff; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+
+    <div class="min-h-screen pb-20">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="profile.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">Terms &amp; Privacy</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <section class="px-5 space-y-6">
+            <div class="tabs" id="tabs">
+                <button class="on" data-t="terms">Terms</button>
+                <button data-t="privacy">Privacy</button>
+            </div>
+
+            <div class="flex items-center justify-between px-2">
+                <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest" id="doc-meta">Last updated 12 May 2026</p>
+                <span class="pill">v2.4.1</span>
+            </div>
+
+            <div class="info-group" id="doc"></div>
+
+            <a href="help.html" class="info-group spring block p-4">
+                <div class="flex items-center gap-4">
+                    <div class="row-ic ic-green"><i class="fa-solid fa-headset"></i></div>
+                    <div class="flex-1">
+                        <p class="text-[13px] font-bold text-slate-800">Questions about these terms?</p>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Contact Visa support</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+                </div>
+            </a>
+
+            <p class="text-center text-[9px] text-slate-400 font-semibold pb-4 leading-relaxed">
+                NovaPay is a demo build. This summary is illustrative and is not a<br>legal agreement. Visa's actual terms govern real cards.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        const DOCS = {
+            terms: {
+                meta: 'Last updated 12 May 2026',
+                secs: [
+                    { t:'Using your account', b:[
+                        'Your NovaPay account is personal to you. You are responsible for keeping your PIN, passcode and biometric access private, and for every transaction authorised through them.',
+                        'You must be at least 18 and provide accurate details. We may suspend an account we believe is being used by someone other than its owner.' ] },
+                    { t:'Cards and payments', b:[
+                        'A card remains the property of the issuer. Freezing a card blocks new authorisations immediately, but recurring charges you have already approved may still be presented.',
+                        'Transactions are shown as pending until the merchant settles them, usually within three business days. Pending amounts can change before they settle.' ] },
+                    { t:'Fees', b:[
+                        'NovaPay does not charge for standard transfers, card issuance or account maintenance. Instant transfers carry a fee shown before you confirm.',
+                        'Foreign transactions are converted at the Visa exchange rate applicable on the day the transaction is processed.' ] },
+                    { t:'Liability', b:[
+                        'Report a lost or stolen card immediately. Under Visa\'s Zero Liability policy you are not held responsible for unauthorised transactions on eligible cards, provided you report them promptly.',
+                        'You remain responsible for transactions you authorised, including those you allowed another person to make.' ] },
+                    { t:'Closing your account', b:[
+                        'You may close your account at any time once the balance is settled. We may close an account with notice, or immediately where required by law or where fraud is suspected.' ] },
+                ]
+            },
+            privacy: {
+                meta: 'Last updated 12 May 2026',
+                secs: [
+                    { t:'What we collect', b:[
+                        'Account details you give us (name, address, contact details), transaction records, and device information such as model, operating system and app version.',
+                        'If you enable biometric login, the biometric data never leaves your device — we only receive a yes or no from the device.' ] },
+                    { t:'How we use it', b:[
+                        'To process payments, prevent fraud, meet legal obligations, and provide support. Fraud detection compares your activity against typical patterns for your account.',
+                        'Personalised offers use your spending categories only if Share Usage Data is switched on in your settings. It is off by default.' ] },
+                    { t:'Who we share it with', b:[
+                        'Card networks and your bank, to move money. Regulators and law enforcement where legally required. Service providers bound by contract to protect it.',
+                        'We do not sell your personal data.' ] },
+                    { t:'Your controls', b:[
+                        'You can switch off usage-data sharing and marketing at any time under Privacy &amp; Support. Turning them off does not affect fraud alerts, which are part of protecting your account.',
+                        'Erase App Data clears everything this app stores on your device. It does not delete your account.' ] },
+                    { t:'Retention', b:[
+                        'Transaction records are kept for the period required by financial regulation, typically seven years, after which they are deleted or anonymised.' ] },
+                ]
+            }
+        };
+
+        let tab = 'terms';
+
+        function render() {
+            const d = DOCS[tab];
+            document.getElementById('doc-meta').textContent = d.meta;
+            document.getElementById('doc').innerHTML = d.secs.map((s, i) => `
+                <div class="sec" id="sec-${i}">
+                    <button class="sec-h" onclick="toggleSec(${i})">
+                        <span class="n">${i+1}</span>
+                        <span class="t">${s.t}</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="sec-b">${s.b.map(p => `<p>${p}</p>`).join('')}</div>
+                </div>`).join('');
+        }
+
+        function toggleSec(i) {
+            const el = document.getElementById('sec-' + i);
+            const was = el.classList.contains('open');
+            document.querySelectorAll('.sec').forEach(s => s.classList.remove('open'));
+            if (!was) el.classList.add('open');
+            if (navigator.vibrate) navigator.vibrate(8);
+        }
+
+        document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+            tab = b.dataset.t;
+            document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+            if (navigator.vibrate) navigator.vibrate(10);
+            render();
+        });
+
+        // deep-link: profile's Privacy row can land straight on the privacy tab
+        if (location.hash === '#privacy') {
+            tab = 'privacy';
+            document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'privacy'));
+        }
+        render();
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

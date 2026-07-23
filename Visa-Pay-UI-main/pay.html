@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Pay</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="pay-sheet.js?v=16" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; padding-bottom:110px; }
+
+        /* ambient glass wash */
+        .pay-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .pay-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .pay-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .glass {
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+        }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.95); }
+        .hide-scrollbar::-webkit-scrollbar{ display:none; }
+
+        /* header */
+        .profile-pill { display:flex; align-items:center; gap:9px; padding:6px 14px 6px 6px; border-radius:999px;
+            background:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.8); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+
+        /* action grid */
+        .action-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:0 20px; }
+        .action-item { display:flex; flex-direction:column; align-items:center; gap:7px; padding:14px 4px; border-radius:20px; cursor:pointer;
+            background:rgba(255,255,255,.4); backdrop-filter:blur(18px) saturate(150%); -webkit-backdrop-filter:blur(18px) saturate(150%);
+            border:1px solid rgba(255,255,255,.7); box-shadow:0 8px 20px -12px rgba(60,80,150,.3), inset 0 1px 0 rgba(255,255,255,.8);
+            transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+        .action-item:active { transform:scale(.94); }
+        .action-icon { width:40px; height:40px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:16px;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        .action-icon > i { display:flex; align-items:center; justify-content:center; width:1em; height:1em; line-height:1; }
+        .action-text { font-size:10px; font-weight:700; color:#475569; text-align:center; line-height:1.2; }
+
+        /* quick pay people */
+        .people-row { display:flex; gap:16px; overflow-x:auto; padding:4px 20px 8px; }
+        .person-item { display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; flex-shrink:0; }
+        .person-item:active { transform:scale(.95); }
+        .person-img { width:60px; height:60px; border-radius:50%; object-fit:cover; border:3px solid #fff;
+            box-shadow:0 8px 20px -8px rgba(60,80,150,.4); }
+        .person-name { font-size:11px; font-weight:700; color:#334155; max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .person-add { width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            background:rgba(255,255,255,.55); border:2px dashed rgba(58,107,255,.4); color:#3a6bff; }
+
+        /* pending actions (bills) */
+        .smart-feed { display:flex; gap:14px; overflow-x:auto; padding:4px 20px 8px; }
+        .smart-card { min-width:250px; border-radius:22px; padding:16px; flex-shrink:0;
+            background:rgba(255,255,255,.5); backdrop-filter:blur(20px) saturate(150%); -webkit-backdrop-filter:blur(20px) saturate(150%);
+            border:1px solid rgba(255,255,255,.75); box-shadow:0 12px 30px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.8);
+            transition:transform .3s, opacity .3s; }
+        .bill-logo { width:42px; height:42px; border-radius:12px; flex-shrink:0; }
+        .pay-btn { width:100%; margin-top:14px; padding:10px; border:none; border-radius:14px; font-weight:800; font-size:13px;
+            background:#0052FF; color:#fff; box-shadow:0 8px 20px -8px rgba(0,82,255,.5); cursor:pointer; transition:transform .2s; }
+        .pay-btn:active { transform:scale(.97); }
+
+        /* modal */
+        #modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(15,23,42,.4); backdrop-filter:blur(8px);
+            display:none; align-items:flex-end; justify-content:center; }
+        #modal-overlay.active { display:flex; }
+        #modal-content { width:100%; max-width:448px; border-radius:30px 30px 0 0; padding:28px 24px calc(28px + env(safe-area-inset-bottom));
+            background:rgba(255,255,255,.75); backdrop-filter:blur(40px) saturate(160%); -webkit-backdrop-filter:blur(40px) saturate(160%);
+            border:1px solid rgba(255,255,255,.8); box-shadow:0 -20px 50px rgba(0,0,0,.2); text-align:center;
+            transform:translateY(100%); transition:transform .5s cubic-bezier(.34,1.4,.5,1); }
+        #modal-overlay.active #modal-content { transform:translateY(0); }
+        .modal-in { background:rgba(120,140,190,.08); border:1px solid rgba(120,140,190,.15); border-radius:14px;
+            padding:14px; width:100%; outline:none; font-weight:700; color:#0f172a; margin-bottom:12px; }
+        .modal-in:focus { border-color:rgba(58,107,255,.5); background:rgba(255,255,255,.55); }
+        .anim-icon { width:64px; height:64px; margin:0 auto 18px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+        .floating { animation:iconFloat 3s ease-in-out infinite; }
+        @keyframes iconFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+
+        /* nav: dark-on-light variant of shared nv-nav */
+        .nv-nav-bar{ background:rgba(255,255,255,.82) !important; border:1px solid rgba(255,255,255,.9) !important; }
+        .nv-item{ color:#8a93ab; } .nv-item.on{ color:#3a6bff; }
+
+        /* offers */
+        .ad-scroll { display:flex; gap:14px; overflow-x:auto; padding:4px 20px 8px; }
+        .ad-card { min-width:230px; height:150px; border-radius:24px; flex-shrink:0; position:relative; overflow:hidden; cursor:pointer;
+            box-shadow:0 14px 34px -12px rgba(0,0,0,.3); transition:transform .3s; }
+        .ad-card:active { transform:scale(.97); }
+        .ad-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .ad-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 65%); }
+        .ad-content { position:absolute; bottom:0; left:0; right:0; padding:16px; color:#fff; }
+        .ad-tag { display:inline-block; font-size:9px; font-weight:800; padding:3px 8px; border-radius:6px; margin-bottom:6px;
+            background:rgba(255,255,255,.22); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.25); }
+
+        @keyframes enter { from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+        .animate-enter { animation:enter .5s cubic-bezier(.16,1,.3,1) both; }
+        .delay-1{animation-delay:.06s} .delay-2{animation-delay:.12s} .delay-3{animation-delay:.18s}
+
+        :root[data-theme="dark"] .pay-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .glass, :root[data-theme="dark"] .action-item, :root[data-theme="dark"] .smart-card{
+            background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.08); }
+        :root[data-theme="dark"] .action-text{ color:#cbd5e1; } :root[data-theme="dark"] .person-name{ color:#cbd5e1; }
+        :root[data-theme="dark"] #modal-content{ background:rgba(30,34,44,.85); }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="pay-bg"></div>
+
+    <!-- HEADER -->
+    <header class="flex items-center justify-between px-5 pt-7 pb-5 animate-enter">
+        <a href="home.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-700">
+            <i class="fa-solid fa-house text-[15px]"></i>
+        </a>
+        <div class="profile-pill">
+            <img src="IMG_20251214_013513.jpg" class="w-8 h-8 rounded-full object-cover">
+            <div class="flex flex-col">
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Hello</span>
+                <span class="text-[13px] font-extrabold text-slate-800 leading-none">@pranav_d_18</span>
+            </div>
+        </div>
+        <a href="notifications.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-600">
+            <i class="fa-regular fa-bell text-[15px]"></i>
+        </a>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="px-5 mb-6 animate-enter delay-1">
+        <div class="glass rounded-2xl p-3.5 flex items-center gap-3">
+            <i class="fa-solid fa-magnifying-glass text-blue-600"></i>
+            <input type="text" placeholder="Pay friends, numbers, or bills" class="w-full outline-none text-sm font-semibold bg-transparent placeholder-slate-400 text-slate-800">
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="action-grid animate-enter delay-2">
+        <div class="action-item" onclick="location.href='tap.html'">
+            <div class="action-icon" style="background:rgba(58,107,255,.14);color:#3a6bff"><i class="fa-solid fa-wifi rotate-90"></i></div>
+            <span class="action-text">Tap to Pay</span>
+        </div>
+        <div class="action-item" onclick="openPopup('contact')">
+            <div class="action-icon" style="background:rgba(99,102,241,.14);color:#6366f1"><i class="fa-solid fa-user-group"></i></div>
+            <span class="action-text">To Contact</span>
+        </div>
+        <div class="action-item" onclick="openPopup('username')">
+            <div class="action-icon" style="background:rgba(20,184,166,.14);color:#14b8a6"><i class="fa-solid fa-at"></i></div>
+            <span class="action-text">To Username</span>
+        </div>
+        <div class="action-item" onclick="location.href='transactions.html'">
+            <div class="action-icon" style="background:rgba(139,92,246,.14);color:#8b5cf6"><i class="fa-solid fa-building-columns"></i></div>
+            <span class="action-text">Bank Txn</span>
+        </div>
+        <div class="action-item" onclick="location.href='wallet.html'">
+            <div class="action-icon" style="background:rgba(245,158,11,.14);color:#f59e0b"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+            <span class="action-text">Self Transfer</span>
+        </div>
+        <div class="action-item" onclick="openPopup('bills')">
+            <div class="action-icon" style="background:rgba(240,80,110,.14);color:#f0506e"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <span class="action-text">Pay Bills</span>
+        </div>
+        <div class="action-item" onclick="openPopup('recharge')">
+            <div class="action-icon" style="background:rgba(18,184,134,.14);color:#12b886"><i class="fa-solid fa-bolt"></i></div>
+            <span class="action-text">Recharge</span>
+        </div>
+        <div class="action-item" onclick="location.href='stats.html'">
+            <div class="action-icon" style="background:rgba(100,116,139,.14);color:#64748b"><i class="fa-solid fa-chart-line"></i></div>
+            <span class="action-text">Insights</span>
+        </div>
+        <div class="action-item" onclick="openPopup('split')">
+            <div class="action-icon" style="background:rgba(236,72,153,.14);color:#ec4899"><i class="fa-solid fa-users-between-lines"></i></div>
+            <span class="action-text">Split Bill</span>
+        </div>
+        <div class="action-item" onclick="openPopup('request')">
+            <div class="action-icon" style="background:rgba(34,197,94,.14);color:#22c55e"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <span class="action-text">Request</span>
+        </div>
+        <div class="action-item" onclick="location.href='receive.html'">
+            <div class="action-icon" style="background:rgba(14,165,233,.14);color:#0ea5e9"><i class="fa-solid fa-qrcode"></i></div>
+            <span class="action-text">Scan QR</span>
+        </div>
+        <div class="action-item" onclick="openPopup('abroad')">
+            <div class="action-icon" style="background:rgba(168,85,247,.14);color:#a855f7"><i class="fa-solid fa-earth-americas"></i></div>
+            <span class="action-text">Send Abroad</span>
+        </div>
+    </div>
+
+    <!-- QUICK PAY -->
+    <div class="px-5 mb-3 mt-7 animate-enter delay-3"><h3 class="text-[15px] font-extrabold text-slate-800">Quick Pay</h3></div>
+    <div class="people-row hide-scrollbar animate-enter delay-3" id="people-row"></div>
+
+    <!-- PENDING ACTIONS -->
+    <div class="px-5 mt-7 mb-3 flex items-end justify-between animate-enter delay-3">
+        <h3 class="text-[15px] font-extrabold text-slate-800">Pending Actions</h3>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide" id="bill-count">—</span>
+    </div>
+    <div class="smart-feed hide-scrollbar animate-enter delay-3" id="bill-feed"></div>
+
+    <!-- OFFERS -->
+    <div class="px-5 mt-7 mb-3 flex justify-between items-end animate-enter delay-3">
+        <h3 class="text-[15px] font-extrabold text-slate-800">Exclusive For You</h3>
+        <span class="text-[11px] font-bold text-blue-600 cursor-pointer" onclick="location.href='offers.html'">See all</span>
+    </div>
+    <div class="ad-scroll hide-scrollbar animate-enter delay-3" id="offers"></div>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" onclick="closePopup(event)">
+        <div id="modal-content"></div>
+    </div>
+
+    <!-- NAV -->
+    <div class="nv-nav"><div class="nv-nav-bar">
+        <a href="home.html" class="nv-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="cards.html" class="nv-item"><i class="fa-solid fa-credit-card"></i><span>Cards</span></a>
+        <a href="pay.html" class="nv-fab"><i class="fa-solid fa-qrcode"></i></a>
+        <a href="stats.html" class="nv-item"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
+        <a href="user.html" class="nv-item"><i class="fa-solid fa-user"></i><span>User</span></a>
+    </div></div>
+
+    <script>
+        // ---- OFFERS ----
+        const OFFERS = [
+            { tag:'NIKE · 15% OFF', tagbg:'rgba(255,255,255,.22)', title:'Air Max Collection',
+              img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80' },
+            { tag:'STARBUCKS',      tagbg:'rgba(18,184,134,.75)',  title:'Free Latte, First Order',
+              img:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
+            { tag:'APPLE',          tagbg:'rgba(0,0,0,.55)',       title:'MacBook Pro M3',
+              img:'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80' },
+            { tag:'EMIRATES · 2X',  tagbg:'rgba(58,107,255,.7)',   title:'First-Class Miles',
+              img:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80' },
+        ];
+        function renderOffers() {
+            document.getElementById('offers').innerHTML = OFFERS.map(o => `
+                <div class="ad-card" onclick="location.href='offers.html'">
+                    <img class="ad-bg" src="${o.img}" alt="">
+                    <div class="ad-overlay"></div>
+                    <div class="ad-content">
+                        <span class="ad-tag" style="background:${o.tagbg}">${o.tag}</span>
+                        <h4 class="font-extrabold text-lg leading-tight">${o.title}</h4>
+                    </div>
+                </div>`).join('');
+        }
+
+        // ---- PENDING BILLS ----
+        const bills = [
+            { id:1, name:'Spotify Premium', icon:'fa-music',   c:'#12b886', amount:'$10.99', desc:'Renews in 3 days', tag:'AUTO',    tc:'#64748b' },
+            { id:2, name:'Netflix UHD',     icon:'fa-n',       c:'#f0506e', amount:'$15.49', desc:'Card ••8144',      tag:'DUE',     tc:'#f0506e' },
+            { id:3, name:'Rent',            icon:'fa-house',   c:'#3a6bff', amount:'$1,850', desc:'Scheduled Jul 26', tag:'PENDING', tc:'#f59e0b' },
+        ];
+        document.getElementById('bill-count').textContent = bills.length + ' Due';
+
+        function renderBills() {
+            const container = document.getElementById('bill-feed');
+            container.innerHTML = bills.map(b => `
+                <div class="smart-card" id="bill-${b.id}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex gap-3">
+                            <div class="bill-logo flex items-center justify-center" style="background:${b.c}1f;color:${b.c}">
+                                <i class="fa-solid ${b.icon} text-[16px]"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-extrabold text-sm text-slate-800">${b.name}</h4>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 rounded" style="background:${b.tc}1f;color:${b.tc}">${b.tag}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 font-semibold mt-1">${b.desc}</p>
+                            </div>
+                        </div>
+                        <span class="font-extrabold text-lg text-slate-800">${b.amount}</span>
+                    </div>
+                    <button class="pay-btn" onclick="payBill(this, ${b.id})">Pay Now <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
+                </div>`).join('');
+        }
+
+        function payBill(btn, id) {
+            if (window.confetti) confetti({ particleCount:80, spread:60, origin:{y:.6}, colors:['#0052FF','#22c55e'] });
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Paid'; btn.style.background = '#22c55e';
+            if (navigator.vibrate) navigator.vibrate(12);
+            setTimeout(() => {
+                const card = document.getElementById('bill-' + id);
+                card.style.transform = 'translateY(-20px)'; card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            }, 800);
+        }
+
+        // ---- QUICK PAY PEOPLE (from real state) ----
+        // Quick Pay = saved contacts, then anyone you've recently transacted with who
+        // isn't already a contact (auto-added from transaction history, newest first).
+        function quickPayPeople() {
+            const contacts = NovaPay.contacts();
+            const known = new Set(contacts.map(c => c.name.toLowerCase()));
+            const people = contacts.slice();
+            // merchants/system names to skip — only person-to-person shows in Quick Pay
+            const skip = /netflix|starbucks|uber|whole foods|amazon|spotify|apple|user-|top up|cashback|rent|gym/i;
+            NovaPay.transactions().forEach(t => {
+                const n = (t.name || '').trim();
+                if (!n || skip.test(n) || known.has(n.toLowerCase())) return;
+                known.add(n.toLowerCase());
+                people.push({ id: n.toLowerCase().replace(/\s+/g,'_'), name: n, handle: '', img: '', _recent: true });
+            });
+            return people.slice(0, 8);
+        }
+
+        function renderPeople() {
+            const row = document.getElementById('people-row');
+            // saved contacts open their own page (mike.html, divyanshi.html, …);
+            // anyone auto-added from recent transactions opens the pay sheet
+            row.innerHTML = quickPayPeople().map(c => {
+                const hasPage = ['mike','raj','sarah','divyanshi'].includes(c.id);
+                const action = hasPage
+                    ? `onclick="location.href='${c.id}.html'"`
+                    : `onclick='PaySheet.open(${JSON.stringify(c).replace(/'/g,"&#39;")})'`;
+                return `
+                <div class="person-item" ${action}>
+                    <img src="${NovaPay.avatarFor(c)}" class="person-img" onerror="this.src='https://ui-avatars.com/api/?background=eef&color=3a6bff&bold=true&name=${encodeURIComponent(c.name)}'">
+                    <span class="person-name">${c.name}</span>
+                </div>`;
+            }).join('') + `
+                <div class="person-item" onclick="openPopup('contact')">
+                    <div class="person-add"><i class="fa-solid fa-plus"></i></div>
+                    <span class="person-name">Add</span>
+                </div>`;
+        }
+        // single guarded init — runs once the DOM is ready and app.js has attached NovaPay,
+        // so a slow/blocked CDN script can't leave the page half-rendered
+        function initPay() {
+            if (typeof NovaPay === 'undefined') { setTimeout(initPay, 30); return; }
+            renderOffers(); renderBills(); renderPeople();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPay);
+        else initPay();
+        window.addEventListener('novapay:change', () => { NovaPay.reload(); renderPeople(); });
+
+        // ---- POPUPS ----
+        function openPopup(type) {
+            const content = document.getElementById('modal-content');
+            let html = '';
+            if (type === 'bills') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(18,184,134,.14);color:#12b886"><i class="fa-solid fa-mug-hot floating"></i></div>
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-2">All Clear!</h3>
+                    <p class="text-sm text-slate-500 mb-6">No pending bills right now. Enjoy your coffee ☕</p>
+                    <button class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl" onclick="closePopup(null,true)">Awesome</button>`;
+            } else if (type === 'recharge') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(58,107,255,.14);color:#3a6bff"><i class="fa-solid fa-bolt floating"></i></div>
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-2">Fully Charged</h3>
+                    <p class="text-sm text-slate-500 mb-6">No recharge due. Your plan expires in <span class="font-bold text-slate-800">12 days</span>.</p>
+                    <button class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl" onclick="closePopup(null,true)">Got it</button>`;
+            } else if (type === 'username') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(20,184,166,.14);color:#14b8a6"><i class="fa-solid fa-at floating"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-4">Pay by Username</h3>
+                    <div class="modal-in flex items-center mb-4" style="padding:0 0 0 14px">
+                        <span class="text-slate-400 font-bold">@</span>
+                        <input id="uname-in" type="text" placeholder="username" class="w-full bg-transparent p-3.5 outline-none font-bold text-slate-800" autocomplete="off">
+                    </div>
+                    <button class="w-full bg-teal-600 text-white font-bold py-3.5 rounded-xl" onclick="payUsername()">Continue</button>`;
+            } else if (type === 'contact') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(99,102,241,.14);color:#6366f1"><i class="fa-solid fa-user-plus floating"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-1">Pay a New Contact</h3>
+                    <p class="text-xs text-slate-500 mb-4">They'll be saved to your Quick Pay.</p>
+                    <input id="c-name" type="text" placeholder="Name" class="modal-in" autocomplete="off">
+                    <input id="c-handle" type="text" placeholder="@handle or phone" class="modal-in" autocomplete="off">
+                    <button class="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl" onclick="payNewContact()">Continue</button>`;
+            } else if (type === 'split') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(236,72,153,.14);color:#ec4899"><i class="fa-solid fa-users-between-lines floating"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-1">Split a Bill</h3>
+                    <p class="text-xs text-slate-500 mb-4">Divide equally and request from everyone.</p>
+                    <input id="sp-amt" type="text" inputmode="decimal" placeholder="Total amount ($)" class="modal-in" autocomplete="off">
+                    <input id="sp-n" type="number" min="2" value="2" placeholder="Split between (people)" class="modal-in" autocomplete="off">
+                    <p id="sp-each" class="text-[13px] font-bold text-slate-500 mb-3">Each pays: —</p>
+                    <button class="w-full bg-pink-600 text-white font-bold py-3.5 rounded-xl" onclick="doSplit()">Send Requests</button>`;
+            } else if (type === 'request') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(34,197,94,.14);color:#22c55e"><i class="fa-solid fa-hand-holding-dollar floating"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-1">Request Money</h3>
+                    <p class="text-xs text-slate-500 mb-4">Ask a contact to pay you.</p>
+                    <input id="rq-who" type="text" placeholder="From (name or @handle)" class="modal-in" autocomplete="off">
+                    <input id="rq-amt" type="text" inputmode="decimal" placeholder="Amount ($)" class="modal-in" autocomplete="off">
+                    <button class="w-full bg-green-600 text-white font-bold py-3.5 rounded-xl" onclick="doRequest()">Send Request</button>`;
+            } else if (type === 'abroad') {
+                html = `
+                    <div class="anim-icon" style="background:rgba(168,85,247,.14);color:#a855f7"><i class="fa-solid fa-earth-americas floating"></i></div>
+                    <h3 class="text-xl font-extrabold text-slate-800 mb-2">International Transfer</h3>
+                    <p class="text-sm text-slate-500 mb-6">Cross-border payments need your bank to authorise — we couldn't reach them just now.</p>
+                    <button class="w-full bg-purple-600 text-white font-bold py-3.5 rounded-xl" onclick="location.href='unavailable.html'">Try via Bank</button>`;
+            }
+            content.innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('active');
+            // live "each pays" for the split popup
+            if (type === 'split') {
+                const upd = () => {
+                    const t = parseFloat(document.getElementById('sp-amt').value || 0);
+                    const n = Math.max(2, parseInt(document.getElementById('sp-n').value || 2, 10));
+                    document.getElementById('sp-each').textContent = t > 0 ? 'Each pays: ' + NovaPay.fmt(Math.round(t / n * 100)) : 'Each pays: —';
+                };
+                document.getElementById('sp-amt').oninput = upd;
+                document.getElementById('sp-n').oninput = upd;
+            }
+        }
+
+        function doSplit() {
+            const t = parseFloat(document.getElementById('sp-amt').value || 0);
+            const n = Math.max(2, parseInt(document.getElementById('sp-n').value || 2, 10));
+            if (t <= 0) { document.getElementById('sp-amt').focus(); return; }
+            closePopup(null, true);
+            if (window.confetti) confetti({ particleCount:70, spread:55, origin:{y:.7}, colors:['#ec4899','#0052FF'] });
+            if (NovaPay.state.settings.notifications !== false)
+                NovaPay.addNotification({ title:'Split request sent', body:`Requested ${NovaPay.fmt(Math.round(t/n*100))} each from ${n-1} people`, icon:'fa-users-between-lines' });
+            if (navigator.vibrate) navigator.vibrate(12);
+        }
+        function doRequest() {
+            const who = (document.getElementById('rq-who').value || '').trim();
+            const amt = parseFloat(document.getElementById('rq-amt').value || 0);
+            if (!who) { document.getElementById('rq-who').focus(); return; }
+            if (amt <= 0) { document.getElementById('rq-amt').focus(); return; }
+            closePopup(null, true);
+            NovaPay.addNotification({ title:'Request sent', body:`You requested ${NovaPay.fmt(Math.round(amt*100))} from ${who}`, icon:'fa-hand-holding-dollar' });
+            if (navigator.vibrate) navigator.vibrate(12);
+        }
+
+        function payUsername() {
+            const v = (document.getElementById('uname-in').value || '').trim().replace(/^@/, '');
+            if (!v) { document.getElementById('uname-in').focus(); return; }
+            closePopup(null, true);
+            PaySheet.open({ name: v.charAt(0).toUpperCase() + v.slice(1), handle: '@' + v });
+        }
+        function payNewContact() {
+            const name = (document.getElementById('c-name').value || '').trim();
+            const handle = (document.getElementById('c-handle').value || '').trim();
+            if (!name) { document.getElementById('c-name').focus(); return; }
+            closePopup(null, true);
+            PaySheet.open({ name, handle });
+        }
+        function closePopup(e, force = false) {
+            if (force || (e && e.target.id === 'modal-overlay')) {
+                document.getElementById('modal-overlay').classList.remove('active');
+            }
+        }
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

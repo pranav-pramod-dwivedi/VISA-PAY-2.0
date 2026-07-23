@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Help Centre</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .info-group{
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+            border-radius:22px; overflow:hidden; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .row-ic{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        /* FA glyphs carry their own baseline metrics — centring the inline box
+           leaves the glyph sitting high. Make the <i> its own centred flex box.
+           Covers the SOS banner circle too, which isn't a .row-ic. */
+        .row-ic > i, .row-ic > svg, .sos .rounded-full > i { display:flex; align-items:center; justify-content:center;
+            width:1em; height:1em; line-height:1; }
+        .ic-blue{ background:rgba(58,107,255,.13); color:#3a6bff; }
+        .ic-green{ background:rgba(18,184,134,.13); color:#12b886; }
+        .ic-purple{ background:rgba(139,92,246,.13); color:#8b5cf6; }
+        .ic-orange{ background:rgba(245,158,11,.13); color:#f59e0b; }
+        .ic-red{ background:rgba(240,80,110,.13); color:#f0506e; }
+        .ic-grey{ background:rgba(120,140,190,.1); color:#64748b; }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* Flag emoji ride their own baseline like FA glyphs do — centre them in a
+           box the same width as a .row-ic tile so the name column stays aligned. */
+        .flag { width:38px; height:38px; flex-shrink:0; font-size:19px; line-height:1;
+            display:flex; align-items:center; justify-content:center; }
+
+        /* emergency banner */
+        .sos { border-radius:22px; padding:18px; color:#fff;
+            background:linear-gradient(135deg,#f0506e 0%,#c81e45 100%);
+            box-shadow:0 16px 40px -14px rgba(240,80,110,.6); }
+
+        /* FAQ accordion */
+        .faq-q { width:100%; text-align:left; background:none; border:none; padding:14px 16px;
+            display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; }
+        .faq-q span { font-size:13px; font-weight:700; color:#0f172a; }
+        .faq-q i { font-size:11px; color:#8a93ab; transition:transform .3s; flex-shrink:0; }
+        .faq.open .faq-q i { transform:rotate(180deg); }
+        .faq-a { max-height:0; overflow:hidden; transition:max-height .35s cubic-bezier(.4,0,.2,1); }
+        .faq.open .faq-a { max-height:240px; }
+        .faq-a p { font-size:11.5px; line-height:1.65; color:#8a93ab; font-weight:500; padding:0 16px 14px; margin:0; }
+        .faq + .faq { border-top:1px solid rgba(120,140,190,.14); }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] .info-group{ background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.07); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+        :root[data-theme="dark"] .faq-q span{ color:#eaf0ff; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+
+    <div class="min-h-screen pb-20">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="profile.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">Help Centre</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <section class="px-5 space-y-7">
+            <!-- lost / stolen: the one people open the app in a panic for -->
+            <a href="tel:18008471234" class="sos spring block">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-phone-volume text-[17px]"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[14px] font-extrabold">Card lost or stolen?</p>
+                        <p class="text-[11px] font-semibold opacity-85 mt-0.5">Visa Global Customer Care · 24/7</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[12px] opacity-70"></i>
+                </div>
+                <div class="mt-3.5 pt-3.5 border-t border-white/20 flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-75">US &amp; Canada</span>
+                    <span class="text-[15px] font-extrabold tracking-wide">1-800-847-2911</span>
+                </div>
+            </a>
+
+            <!-- Visa contact channels -->
+            <div class="space-y-3">
+                <h3 id="contact" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2 scroll-mt-4">Contact Visa</h3>
+                <div class="info-group" id="contacts"></div>
+            </div>
+
+            <!-- regional numbers -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Global Customer Care</h3>
+                <div class="info-group" id="regions"></div>
+                <p class="text-[10px] text-slate-400 font-semibold px-2 leading-relaxed">
+                    Visa Global Customer Assistance Services operates 24 hours a day, in over 25 languages.
+                </p>
+            </div>
+
+            <!-- FAQ -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Common Questions</h3>
+                <div class="info-group" id="faqs"></div>
+            </div>
+
+            <p class="text-center text-[9px] text-slate-400 font-semibold pt-2 pb-4 leading-relaxed">
+                NovaPay is a demo build.<br>Numbers and links above go to Visa's real support channels.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        // Visa's real, publicly listed support channels.
+        const CONTACTS = [
+            { ic:'fa-globe',        cls:'ic-blue',   label:'Visa Support',        sub:'visa.co.in/support',            href:'https://www.visa.co.in/support/consumer.html' },
+            { ic:'fa-shield-halved',cls:'ic-red',    label:'Report Fraud',        sub:'Dispute an unknown charge',     href:'https://www.visa.co.in/support/consumer/security.html' },
+            { ic:'fa-tags',         cls:'ic-purple', label:'Offers &amp; Perks',      sub:'What your card unlocks',        href:'https://www.visa.co.in/pay-with-visa/offers-and-perks.html' },
+            { ic:'fa-file-contract',cls:'ic-grey',   label:'Legal &amp; Privacy',     sub:'Terms, policies, disclosures',  href:'https://www.visa.co.in/legal/' },
+        ];
+
+        const REGIONS = [
+            { flag:'🇺🇸', name:'United States',  num:'1-800-847-2911',   tel:'18008472911' },
+            { flag:'🇨🇦', name:'Canada',         num:'1-800-847-2911',   tel:'18008472911' },
+            { flag:'🇮🇳', name:'India',          num:'000-800-100-1219', tel:'0008001001219' },
+            { flag:'🇬🇧', name:'United Kingdom', num:'0800-891-725',     tel:'0800891725' },
+            { flag:'🇦🇺', name:'Australia',      num:'1800-450-346',     tel:'1800450346' },
+        ];
+
+        const FAQS = [
+            { q:'My card was declined — why?',
+              a:'Most declines come from a control you can flip yourself: the card being frozen, international use switched off, or a spending limit reached. Check Card Controls in your profile first, then Spending Limits.' },
+            { q:'How do I freeze my card?',
+              a:'Open Cards and tap Freeze, or use the Freeze Card switch under Card Controls in your profile. It takes effect immediately and blocks new transactions — recurring charges you have already authorised may still go through.' },
+            { q:'Where do I find my CVV?',
+              a:'Flip your card in the Cards tab and tap Reveal. Visa prints a 3-digit code in the signature strip on the back; American Express prints a 4-digit CID on the front, above the card number.' },
+            { q:'Someone charged my card without permission.',
+              a:'Freeze the card first, then call Visa Global Customer Care on the number above. Report it as soon as you notice — Visa\'s Zero Liability policy covers unauthorised transactions on eligible cards.' },
+            { q:'Why is my top-up stuck?',
+              a:'Funding requests wait on your linked bank to authorise. If the bank does not respond, the transfer times out and no money moves — your balance stays exactly as it was. Nothing is deducted for a failed attempt.' },
+            { q:'How do I sign out other devices?',
+              a:'Profile → Trusted Devices lists every active session. Revoke any device you do not recognise, or sign out all of them at once. Revoked devices need full verification to get back in.' },
+        ];
+
+        document.getElementById('contacts').innerHTML = CONTACTS.map((c, i) => `
+            <a href="${c.href}" target="_blank" rel="noopener noreferrer"
+               class="p-4 flex items-center justify-between ${i < CONTACTS.length-1 ? 'border-b border-white/40' : ''}">
+                <div class="flex items-center gap-4">
+                    <div class="row-ic ${c.cls}"><i class="fa-solid ${c.ic}"></i></div>
+                    <div>
+                        <p class="text-[13px] font-bold text-slate-800">${c.label}</p>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">${c.sub}</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-300"></i>
+            </a>`).join('');
+
+        document.getElementById('regions').innerHTML = REGIONS.map((r, i) => `
+            <a href="tel:${r.tel}" class="p-4 flex items-center justify-between ${i < REGIONS.length-1 ? 'border-b border-white/40' : ''}">
+                <div class="flex items-center gap-4">
+                    <span class="flag">${r.flag}</span>
+                    <p class="text-[13px] font-bold text-slate-800">${r.name}</p>
+                </div>
+                <span class="text-[12px] font-extrabold" style="color:#3a6bff">${r.num}</span>
+            </a>`).join('');
+
+        document.getElementById('faqs').innerHTML = FAQS.map((f, i) => `
+            <div class="faq" id="faq-${i}">
+                <button class="faq-q" onclick="toggleFaq(${i})">
+                    <span>${f.q}</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="faq-a"><p>${f.a}</p></div>
+            </div>`).join('');
+
+        function toggleFaq(i) {
+            const el = document.getElementById('faq-' + i);
+            const wasOpen = el.classList.contains('open');
+            document.querySelectorAll('.faq').forEach(f => f.classList.remove('open'));
+            if (!wasOpen) el.classList.add('open');
+            if (navigator.vibrate) navigator.vibrate(8);
+        }
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Linked Accounts</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap');
+        body { font-family:'Plus Jakarta Sans',sans-serif; color:#0F172A; margin:0; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+        .mono { font-family:'JetBrains Mono',monospace; }
+
+        .prof-bg { position:fixed; inset:0; z-index:-1; overflow:hidden;
+            background:linear-gradient(170deg,#e6ecff 0%,#eae6fb 50%,#e6f3ff 100%); }
+        .prof-bg::before{ content:""; position:absolute; width:80vw; height:80vw; top:-25vw; left:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#9fbaff,transparent 62%); opacity:.55; filter:blur(50px); }
+        .prof-bg::after{ content:""; position:absolute; width:70vw; height:70vw; bottom:-22vw; right:-20vw; border-radius:50%;
+            background:radial-gradient(circle,#c9b0ff,transparent 62%); opacity:.5; filter:blur(50px); }
+
+        .info-group{
+            background:rgba(255,255,255,.45); backdrop-filter:blur(24px) saturate(160%); -webkit-backdrop-filter:blur(24px) saturate(160%);
+            border:1px solid rgba(255,255,255,.75);
+            box-shadow:0 12px 34px -14px rgba(60,80,150,.35), inset 0 1px 0 rgba(255,255,255,.85);
+            border-radius:22px; overflow:hidden; }
+        .cap-btn{ background:rgba(255,255,255,.72); border:1px solid rgba(255,255,255,.9); box-shadow:0 6px 16px -8px rgba(60,80,150,.3); }
+        .row-ic{ width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.6); }
+        .row-ic > i, .row-ic > svg { display:flex; align-items:center; justify-content:center; width:1em; height:1em; line-height:1; }
+        .ic-blue{ background:rgba(58,107,255,.13); color:#3a6bff; }
+        .ic-green{ background:rgba(18,184,134,.13); color:#12b886; }
+        .ic-orange{ background:rgba(245,158,11,.13); color:#f59e0b; }
+        .ic-grey{ background:rgba(120,140,190,.1); color:#64748b; }
+        .spring{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); } .spring:active{ transform:scale(.96); }
+
+        /* the linked account card */
+        .acct {
+            border-radius:24px; padding:20px; color:#fff; position:relative; overflow:hidden;
+            background:linear-gradient(135deg,#c2213c 0%,#8f0f24 100%);
+            box-shadow:0 20px 46px -16px rgba(194,33,60,.55);
+        }
+        .acct::after {
+            content:""; position:absolute; inset:0;
+            background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.16) 48%,transparent 64%);
+            transform:translateX(-60%); animation:sheen 6s ease-in-out infinite;
+        }
+        @keyframes sheen { 0%,100%{transform:translateX(-60%);} 50%{transform:translateX(60%);} }
+        .acct-logo { width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,.18);
+            display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+        .status-dot { width:7px; height:7px; border-radius:50%; background:#ffd166; box-shadow:0 0 8px #ffd166;
+            animation:blink 1.8s ease-in-out infinite; flex-shrink:0; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+        .kv { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; }
+        .kv + .kv { border-top:1px solid rgba(120,140,190,.14); }
+        .kv-k { font-size:12px; font-weight:700; color:#8a93ab; }
+        .kv-v { font-size:12px; font-weight:800; color:#0f172a; }
+
+        .btn-primary { width:100%; background:#0052FF; color:#fff; font-weight:800; font-size:14px; padding:15px;
+            border:none; border-radius:16px; box-shadow:0 12px 28px -8px rgba(0,82,255,.5);
+            transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+        .btn-primary:active { transform:scale(.97); }
+
+        .warn { border-radius:18px; padding:14px;
+            background:rgba(245,158,11,.09); border:1px solid rgba(245,158,11,.25); }
+
+        :root[data-theme="dark"] .prof-bg{ background:linear-gradient(170deg,#0a0f1e,#0d1226 60%,#0a1020); }
+        :root[data-theme="dark"] .info-group{ background:rgba(40,44,54,.55); border-color:rgba(255,255,255,.07); }
+        :root[data-theme="dark"] body{ color:#eaf0ff; }
+        :root[data-theme="dark"] .kv-v{ color:#eaf0ff; }
+        :root[data-theme="dark"] .text-slate-900{ color:#f2f5ff !important; }
+        :root[data-theme="dark"] .text-slate-800{ color:#eaf0ff !important; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative">
+    <div class="prof-bg"></div>
+
+    <div class="min-h-screen pb-20">
+        <header class="px-5 py-6 flex justify-between items-center">
+            <a href="profile.html" class="cap-btn spring w-10 h-10 rounded-full flex items-center justify-center text-slate-500">
+                <i class="fa-solid fa-chevron-left text-[14px]"></i>
+            </a>
+            <h1 class="text-[14px] font-extrabold text-slate-900">Linked Accounts</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <section class="px-5 space-y-6">
+            <!-- the one linked account -->
+            <div class="acct">
+                <div class="flex items-start gap-3.5 relative z-10">
+                    <div class="acct-logo"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[15px] font-extrabold">Bank of America</p>
+                        <p class="text-[11px] font-semibold opacity-80 mt-0.5">Checking · Primary funding source</p>
+                    </div>
+                </div>
+                <div class="mt-5 pt-4 border-t border-white/20 flex items-end justify-between relative z-10">
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-[.14em] opacity-70 mb-1">Account</p>
+                        <p class="text-[15px] font-extrabold mono tracking-wider">•••• 4290</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] font-bold uppercase tracking-[.14em] opacity-70 mb-1">Balance</p>
+                        <p class="text-[13px] font-extrabold flex items-center gap-1.5 justify-end">
+                            <span class="status-dot"></span>Unavailable
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- why the balance won't load -->
+            <div class="warn">
+                <div class="flex gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-[13px] mt-0.5" style="color:#f59e0b"></i>
+                    <div>
+                        <p class="text-[12px] font-extrabold mb-1" style="color:#a86a08">Bank not responding</p>
+                        <p class="text-[11px] leading-relaxed" style="color:#96702a">
+                            We can't reach Bank of America right now, so the live balance and any transfers are unavailable.
+                            Nothing is wrong with your account.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="checkBalance()" id="chk" class="btn-primary">
+                <i class="fa-solid fa-arrows-rotate mr-2"></i>Check Balance
+            </button>
+
+            <!-- details -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Account Details</h3>
+                <div class="info-group">
+                    <div class="kv"><span class="kv-k">Institution</span><span class="kv-v">Bank of America</span></div>
+                    <div class="kv"><span class="kv-k">Type</span><span class="kv-v">Checking</span></div>
+                    <div class="kv"><span class="kv-k">Account</span><span class="kv-v mono">•••• 4290</span></div>
+                    <div class="kv"><span class="kv-k">Routing</span><span class="kv-v mono">•••• 0159</span></div>
+                    <div class="kv"><span class="kv-k">Linked</span><span class="kv-v">14 Mar 2026</span></div>
+                    <div class="kv"><span class="kv-k">Status</span><span class="kv-v" style="color:#f59e0b">Unreachable</span></div>
+                </div>
+            </div>
+
+            <!-- actions -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-2">Manage</h3>
+                <div class="info-group">
+                    <a href="topup.html" class="p-4 border-b border-white/40 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-green"><i class="fa-solid fa-plus"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Add Money</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+                    </a>
+                    <a href="help.html" class="p-4 border-b border-white/40 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-blue"><i class="fa-solid fa-headset"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Contact Support</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+                    </a>
+                    <button onclick="alert('Add another account — coming soon')" class="w-full p-4 flex items-center justify-between bg-transparent border-none">
+                        <div class="flex items-center gap-4">
+                            <div class="row-ic ic-grey"><i class="fa-solid fa-link"></i></div>
+                            <span class="text-[13px] font-bold text-slate-800">Link Another Account</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-center text-[9px] text-slate-400 font-semibold pb-4 leading-relaxed">
+                NovaPay is a demo build. No bank is actually connected.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        // Checking the balance goes through the same gateway as a top-up — and the
+        // bank never answers, so it always ends up unavailable.
+        function checkBalance() {
+            const b = document.getElementById('chk');
+            b.disabled = true;
+            b.style.opacity = '.6';
+            b.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Contacting bank…';
+            if (navigator.vibrate) navigator.vibrate(10);
+            setTimeout(() => { location.href = 'unavailable.html?from=balance'; }, 700);
+        }
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>

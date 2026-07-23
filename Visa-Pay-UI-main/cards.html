@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NovaPay | Cards</title>
+    <script src="app.js?v=16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css?v=16">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; margin:0; overflow-x:hidden; }
+        .num { font-family:'Space Grotesk',sans-serif; }
+        .wrap { position:relative; z-index:2; }
+        .ink{color:var(--nv-ink)} .sub{color:var(--nv-sub)}
+        .glass { background:var(--nv-glass); backdrop-filter:blur(26px) saturate(150%); -webkit-backdrop-filter:blur(26px) saturate(150%); border:1px solid var(--nv-glass-brd); box-shadow:inset 0 1px 0 var(--nv-glass-hi), var(--nv-shadow); }
+        /* Apple spring tap */
+        .spring { transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
+        .spring:active { transform: scale(.94); }
+
+        /* ---------- STACKED DECK ---------- */
+        /* pinned header + deck. The page background is a fixed .aurora, so the sticky
+           block needs its own fade or the scrolling panels show through behind the card. */
+        .pinned {
+            position:sticky; top:0; z-index:40;
+            padding:28px 20px 6px; margin:-28px -20px 0;
+            background:linear-gradient(to bottom, var(--nv-bg) 76%, transparent);
+        }
+        .pinned::before {
+            content:""; position:absolute; inset:0 0 24px; z-index:-1;
+            backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
+            -webkit-mask:linear-gradient(to bottom,#000 78%,transparent);
+                    mask:linear-gradient(to bottom,#000 78%,transparent);
+        }
+        .deck { position:relative; height:230px; perspective:1100px; margin-bottom:12px; }
+        /* glare that follows the tilt */
+        .glare { position:absolute; inset:0; z-index:4; pointer-events:none; border-radius:26px; opacity:0; transition:opacity .3s;
+            background:radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.5), transparent 45%); mix-blend-mode:overlay; }
+        .deck-card.tilting .glare { opacity:1; }
+        .deck-card {
+            position:absolute; left:0; right:0; margin:auto; width:100%; aspect-ratio:1.586/1;
+            transform-style:preserve-3d;
+            transition: transform .6s cubic-bezier(.34,1.3,.5,1), box-shadow .5s, opacity .4s;
+            cursor:pointer;
+            touch-action:none;   /* let JS handle the swipe instead of the browser scrolling */
+            user-select:none; -webkit-user-select:none;
+        }
+        .deck-card * { pointer-events:none; }  /* children never steal the pointer from the card */
+        /* stack positions (behind cards peek up) */
+        .deck-card[data-pos="0"] { transform:translateY(0) scale(1); z-index:30; }
+        .deck-card[data-pos="1"] { transform:translateY(-26px) scale(.92); z-index:20; opacity:.85; }
+        .deck-card[data-pos="2"] { transform:translateY(-48px) scale(.85); z-index:10; opacity:.6; }
+        .deck-card.dragging { transition:none; will-change:transform, opacity; }
+        .deck-card.dragging .holo { animation:none !important; }        /* stop repaints while dragging */
+        .deck-card.dragging .face::before, .deck-card.dragging .face::after { display:none; }  /* drop texture layers during drag */
+
+        /* flip */
+        .flip-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.4,.2,.2,1); border-radius:26px; }
+        .deck-card.flipped .flip-inner { transform:rotateY(180deg); }
+
+        .face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:26px; overflow:hidden;
+                padding:24px; display:flex; flex-direction:column; justify-content:space-between;
+                box-shadow:0 30px 60px -24px rgba(20,20,60,.6), inset 0 1px 0 rgba(255,255,255,.3), inset 0 -30px 60px rgba(0,0,0,.15); }
+
+        /* ---- VISA: deep indigo with guilloché sheen + soft light pool ---- */
+        .face.visa { background:
+            radial-gradient(140% 120% at 85% -10%, rgba(255,255,255,.28), transparent 45%),
+            radial-gradient(120% 120% at 0% 120%, rgba(0,0,0,.35), transparent 55%),
+            linear-gradient(135deg,#4364ff 0%, #6a3cf0 48%, #3320a8 100%); }
+        .face.visa::before { content:""; position:absolute; inset:0; z-index:0; opacity:.5; mix-blend-mode:soft-light;
+            background:
+              repeating-radial-gradient(circle at 30% 30%, rgba(255,255,255,.14) 0 1px, transparent 1px 9px),
+              repeating-linear-gradient(60deg, rgba(255,255,255,.06) 0 1px, transparent 1px 14px); }
+
+        /* ---- AMEX: classic Amex blue, matches app palette ---- */
+        .face.amex { background:
+            radial-gradient(140% 120% at 85% -10%, rgba(255,255,255,.3), transparent 45%),
+            radial-gradient(120% 120% at 0% 120%, rgba(0,0,0,.28), transparent 55%),
+            linear-gradient(135deg,#2f8fe0 0%, #1878cf 45%, #0a4f9e 100%); }
+        .face.amex::before { content:""; position:absolute; inset:0; z-index:0; opacity:.45; mix-blend-mode:soft-light;
+            background: repeating-radial-gradient(circle at 30% 30%, rgba(255,255,255,.12) 0 1px, transparent 1px 9px),
+                        repeating-linear-gradient(60deg, rgba(255,255,255,.06) 0 1px, transparent 1px 14px); }
+        .amex-badge { display:inline-block; background:#fff; color:#0a4f9e; font-family:Arial,Helvetica,sans-serif; font-weight:800;
+            font-size:9px; line-height:1.05; letter-spacing:.5px; padding:5px 7px; border-radius:3px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.25); }
+
+        /* subtle top gloss on all cards */
+        .face.front::after { content:""; position:absolute; left:0; right:0; top:0; height:45%; z-index:1; pointer-events:none;
+            background:linear-gradient(180deg, rgba(255,255,255,.14), transparent); border-radius:26px 26px 40% 40%; }
+        .face.back { transform:rotateY(180deg); background:linear-gradient(135deg,#1b2350,#0e1330); justify-content:flex-start; }
+
+        /* holographic sheen sweep */
+        .holo { position:absolute; inset:0; z-index:2; pointer-events:none; mix-blend-mode:overlay;
+            background:linear-gradient(115deg, transparent 25%, rgba(255,255,255,.55) 47%, rgba(255,255,255,.15) 53%, transparent 75%);
+            transform:translateX(-120%); }
+        .deck-card[data-pos="0"] .front .holo { animation: sweep 5s ease-in-out infinite; }
+        @keyframes sweep { 0%,100%{transform:translateX(-120%)} 50%{transform:translateX(120%)} }
+
+        /* zig-zag forcefield FREEZE */
+        .forcefield { position:absolute; inset:0; z-index:6; pointer-events:none; border-radius:26px; opacity:0; transition:opacity .45s;
+            background-image:
+              repeating-linear-gradient(45deg, rgba(150,200,255,.18) 0 2px, transparent 2px 11px),
+              repeating-linear-gradient(-45deg, rgba(150,200,255,.18) 0 2px, transparent 2px 11px);
+            backdrop-filter:blur(1px) brightness(1.05); }
+        .frost-scan { position:absolute; left:0; right:0; height:40%; top:-40%;
+            background:linear-gradient(180deg, transparent, rgba(190,225,255,.4), transparent); }
+        .face.frozen { filter:grayscale(.55) brightness(.82) contrast(1.05); }
+        .face.frozen .forcefield { opacity:1; }
+        .face.frozen .frost-scan { animation: scan 2.2s ease-in-out infinite; }
+        @keyframes scan { 0%{top:-40%} 100%{top:110%} }
+        .freeze-flake { position:absolute; inset:0; z-index:7; display:none; align-items:center; justify-content:center; color:#dbeeff; font-size:2.2rem; text-shadow:0 0 20px rgba(140,200,255,.9); pointer-events:none; }
+        .face.frozen .freeze-flake { display:flex; animation: flakepop .5s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes flakepop { 0%{transform:scale(.2) rotate(-40deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
+
+        .chip { width:44px;height:32px;border-radius:6px;background:linear-gradient(135deg,#c8a24a,#f7e79b 50%,#c8a24a);position:relative;z-index:1;box-shadow:0 1px 3px rgba(0,0,0,.35); }
+        .chip::before{content:"";position:absolute;inset:6px;border:1px solid rgba(0,0,0,.15);border-radius:3px}
+        .magstripe { width:100%; height:44px; background:#0a0e1e; margin-top:20px; }
+        .sigstrip { height:34px; margin:14px 16px 0; border-radius:5px; display:flex; align-items:center; justify-content:space-between; padding:0 8px 0 12px; gap:8px;
+            background:repeating-linear-gradient(45deg,#eef2ff 0 3px,#fff 3px 6px); color:#1e293b; font-style:italic; font-weight:700; font-family:'Space Grotesk',monospace; }
+        .sig-name { font-size:11px; opacity:.75; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        /* CVV sits in its own printed box at the end of the strip, like the real thing */
+        .cvv-box { flex-shrink:0; background:#fff; border-radius:3px; padding:2px 7px; font-style:normal; letter-spacing:1.5px;
+            font-size:12px; color:#0f172a; box-shadow:inset 0 0 0 1px rgba(15,23,42,.12); }
+        .cvv-lbl { font-size:7px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45);
+            text-align:right; margin:4px 18px 0 0; }
+        /* Amex prints its 4-digit CID on the front, above the number — not on the back */
+        .amex-cid { font-size:11px; font-weight:700; letter-spacing:2px; color:rgba(255,255,255,.75); margin-bottom:2px; min-height:14px; }
+
+        .dots { display:flex; gap:6px; justify-content:center; margin-bottom:22px; }
+        .dots i { width:7px;height:7px;border-radius:50%;background:var(--nv-glass-brd);transition:all .3s; }
+        .dots i.on { width:22px;border-radius:99px;background:linear-gradient(90deg,#3a6bff,#7a49ff); }
+
+        .ctrls { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+        .ctrl { display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px 6px; border-radius:18px; }
+        .ctrl .ic { width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
+        .ctrl:active .ic { transform:scale(.85) rotate(-8deg); }
+        .ctrl span { font-size:11px; font-weight:700; color:var(--nv-ink2); }
+
+        .bar { height:8px; border-radius:999px; background:var(--nv-glass-brd); overflow:hidden; }
+        .bar > span { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#3a6bff,#7a49ff); transition:width .6s cubic-bezier(.34,1.3,.5,1); }
+
+        .swipe-hint { text-align:center; font-size:11px; color:var(--nv-sub); margin-top:-4px; margin-bottom:14px; }
+        .drow { display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--nv-glass-brd); }
+        .drow:last-child { border-bottom:none; }
+        .drow .k { font-size:12px; color:var(--nv-sub); font-weight:600; }
+        .drow .v { font-size:13px; color:var(--nv-ink); font-weight:700; }
+        .badge-ok { background:rgba(18,184,134,.16); color:#12b886; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:800; }
+        .badge-frozen { background:rgba(58,107,255,.16); color:#3a6bff; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:800; }
+
+        /* animated bottom sheet */
+        .sheet-ov { position:fixed; inset:0; z-index:200; background:rgba(8,10,24,.5); backdrop-filter:blur(6px); display:none; align-items:flex-end; justify-content:center; }
+        .sheet-ov.open { display:flex; }
+        .sheet { width:100%; max-width:448px; background:var(--nv-glass); backdrop-filter:blur(40px) saturate(160%); -webkit-backdrop-filter:blur(40px) saturate(160%);
+            border:1px solid var(--nv-glass-brd); border-radius:30px 30px 0 0; padding:24px 22px calc(28px + env(safe-area-inset-bottom)); text-align:center;
+            transform:translateY(100%); transition:transform .5s cubic-bezier(.34,1.4,.5,1); box-shadow:0 -20px 50px rgba(0,0,0,.3); }
+        .sheet-ov.open .sheet { transform:translateY(0); }
+        .sheet-grab { width:40px;height:5px;border-radius:99px;background:var(--nv-glass-brd);margin:0 auto 18px; }
+        .sheet-ic { width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:4px auto 16px; animation:sheetpop .5s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes sheetpop { 0%{transform:scale(.3);opacity:0} 100%{transform:scale(1);opacity:1} }
+        .sheet h3 { font-size:19px; font-weight:800; color:var(--nv-ink); margin:0 0 6px; }
+        .sheet p { font-size:13px; color:var(--nv-sub); margin:0 0 20px; line-height:1.5; }
+        .sheet-btn { width:100%; padding:15px; border:none; border-radius:16px; font-weight:800; font-size:15px; color:#fff; background:linear-gradient(135deg,#3a6bff,#7a49ff); transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+        .sheet-btn:active { transform:scale(.97); }
+        .sheet-btn.ghost { background:var(--nv-glass); color:var(--nv-ink2); border:1px solid var(--nv-glass-brd); margin-top:8px; }
+        .sheet-btn.danger { background:linear-gradient(135deg,#f0506e,#e11d48); }
+
+        /* apple-wallet fly animation */
+        @keyframes flyToWallet { 0%{transform:translateY(0) scale(1);opacity:1} 60%{transform:translateY(-40px) scale(.5) rotate(8deg);opacity:.8} 100%{transform:translateY(-200px) scale(.1) rotate(20deg);opacity:0} }
+        .fly { position:fixed; z-index:300; pointer-events:none; animation:flyToWallet .8s cubic-bezier(.5,0,.75,0) forwards; }
+    </style>
+</head>
+<body class="max-w-md mx-auto">
+    <div class="aurora"></div>
+
+    <div class="wrap px-5 pt-7 pb-32">
+        <!-- pinned: header + deck stay put while the panels below scroll under them -->
+        <div class="pinned">
+            <header class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <a href="home.html" class="glass spring w-10 h-10 rounded-full flex items-center justify-center ink"><i class="fa-solid fa-chevron-left"></i></a>
+                    <h1 class="text-xl font-extrabold ink">My Cards</h1>
+                </div>
+                <button onclick="alert('Add card — coming soon')" class="glass spring w-10 h-10 rounded-full flex items-center justify-center" style="color:var(--nv-blue)"><i class="fa-solid fa-plus"></i></button>
+            </header>
+
+            <!-- STACKED DECK -->
+            <div class="deck" id="deck"></div>
+            <div class="dots" id="dots"></div>
+            <p class="swipe-hint"><i class="fa-solid fa-hand-pointer"></i> Swipe card up to switch · tap to flip</p>
+        </div>
+
+        <!-- CARD DETAILS GLASS PANEL -->
+        <div class="glass rounded-3xl p-5 mb-6">
+            <p class="text-[11px] font-bold sub uppercase tracking-wide mb-3">Card Details</p>
+            <div id="details"></div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="ctrls mb-6">
+            <button class="glass ctrl spring" id="freeze-btn" onclick="doFreeze()"><div class="ic" style="background:rgba(58,107,255,.15);color:#3a6bff"><i class="fa-regular fa-snowflake"></i></div><span id="freeze-lbl">Freeze</span></button>
+            <button class="glass ctrl spring" onclick="doReveal()"><div class="ic" style="background:rgba(18,184,134,.15);color:#12b886"><i class="fa-regular fa-eye" id="reveal-ic"></i></div><span id="reveal-lbl">Reveal</span></button>
+            <button class="glass ctrl spring" onclick="flipCard()"><div class="ic" style="background:rgba(139,92,246,.15);color:#8b5cf6"><i class="fa-solid fa-rotate"></i></div><span>Flip</span></button>
+            <button class="glass ctrl spring" onclick="addToWallet(this)"><div class="ic" id="wallet-ic" style="background:rgba(120,140,190,.15);color:var(--nv-ink)"><i class="fa-brands fa-apple"></i></div><span id="wallet-lbl">Wallet</span></button>
+            <button class="glass ctrl spring" onclick="location.href='security.html'"><div class="ic" style="background:rgba(245,158,11,.15);color:#f59e0b"><i class="fa-solid fa-key"></i></div><span>Reset PIN</span></button>
+            <button class="glass ctrl spring" onclick="openSheet('report')"><div class="ic" style="background:rgba(240,80,110,.15);color:#f0506e"><i class="fa-solid fa-triangle-exclamation"></i></div><span>Report</span></button>
+        </div>
+
+        <!-- SPEND -->
+        <div class="glass rounded-3xl p-5 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <div><p class="text-[11px] font-bold sub uppercase tracking-wide">Monthly Spend</p><p class="num text-2xl font-bold ink mt-1" id="spent">$0</p></div>
+                <div class="text-right"><p class="text-[11px] font-bold sub uppercase tracking-wide">Limit</p><p class="num text-lg font-bold mt-1" id="limit" style="color:var(--nv-blue)">$0</p></div>
+            </div>
+            <div class="bar"><span id="bar" style="width:0%"></span></div>
+            <p class="text-[11px] sub mt-2" id="pct">0% used this month</p>
+        </div>
+    </div>
+
+    <!-- bottom sheet modal -->
+    <div class="sheet-ov" id="sheet-ov" onclick="if(event.target===this)closeSheet()">
+      <div class="sheet" id="sheet-body"></div>
+    </div>
+
+    <div class="nv-nav"><div class="nv-nav-bar">
+        <a href="home.html" class="nv-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="cards.html" class="nv-item on"><i class="fa-solid fa-credit-card"></i><span>Cards</span></a>
+        <a href="pay.html" class="nv-fab"><i class="fa-solid fa-qrcode"></i></a>
+        <a href="stats.html" class="nv-item"><i class="fa-solid fa-chart-line"></i><span>Stats</span></a>
+        <a href="user.html" class="nv-item"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+    </div></div>
+
+    <script>
+        let revealed = false;
+        const VISA = '<img src="assets/visa.svg" class="h-6 brightness-0 invert opacity-90">';
+        const AMEX = '<img src="assets/amex.svg" class="h-9 rounded-md shadow-md">';
+
+        function fullNum(c){ return (c.network==='amex'?'3782 822463 '+c.last4 : '4892 1100 2931 '+c.last4); }
+
+        // build the stacked deck; order[0] = front/active
+        function order() {
+            const cards = NovaPay.cards();
+            const ai = cards.findIndex(c => c.id === NovaPay.activeCard().id);
+            const rot = cards.slice(ai).concat(cards.slice(0, ai)); // active first
+            return rot;
+        }
+
+        function buildDeck() {
+            const deck = document.getElementById('deck');
+            const cards = order();
+            deck.innerHTML = cards.map((c, i) => `
+                <div class="deck-card" data-id="${c.id}" data-pos="${i}" ${i>0?`onclick="bringFront('${c.id}')"`:''}>
+                    <div class="flip-inner">
+                        <div class="face front ${c.network}${c.frozen?' frozen':''}">
+                            <div class="holo"></div>
+                            <div class="glare"></div>
+                            <div class="forcefield"><div class="frost-scan"></div></div>
+                            <div class="freeze-flake"><i class="fa-solid fa-snowflake"></i></div>
+                            <div class="flex justify-between items-start relative z-[3]">
+                                <div class="chip"></div>
+                                ${c.network==='amex'
+                                    ? '<div class="amex-badge">AMERICAN<br>EXPRESS</div>'
+                                    : '<span>'+VISA+'</span>'}
+                            </div>
+                            <div class="relative z-[3]">
+                                ${c.network === 'amex' ? `<p class="amex-cid num">${revealed ? (c.cvv || '') : '•'.repeat((c.cvv || '').length)}</p>` : ''}
+                                <p class="cnum num text-[18px] tracking-[3px] text-white/90 mb-3">•••• •••• •••• ${c.last4}</p>
+                                <div class="flex justify-between items-end">
+                                    <div><p class="text-[9px] font-bold text-white/50 uppercase tracking-widest mb-0.5">Card Holder</p><p class="text-[13px] font-bold text-white tracking-wide">${c.holder}</p></div>
+                                    <div class="text-right"><p class="text-[9px] font-bold text-white/50 uppercase tracking-widest mb-0.5">Expires</p><p class="num text-[13px] font-bold text-white">${c.exp}</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="face back">
+                            <div class="magstripe"></div>
+                            <div class="sigstrip">
+                                <span class="sig-name">${c.holder}</span>
+                                <span class="cvv-box">${revealed ? (c.cvv || '•••') : '•'.repeat((c.cvv || '···').length)}</span>
+                            </div>
+                            <p class="cvv-lbl">${c.network === 'amex' ? '4-digit CID also on front' : 'CVV'}</p>
+                            <p class="text-[8px] text-white/40 mt-2 px-4">Authorized signature — not valid unless signed. NovaPay ${c.name}.</p>
+                        </div>
+                    </div>
+                </div>`).join('');
+            buildDots(cards.length);
+            renderControls();
+            attachSwipe();
+        }
+
+        function buildDots(n) {
+            document.getElementById('dots').innerHTML = Array.from({length:n}).map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('');
+        }
+
+        function bringFront(id) { NovaPay.setActiveCard(id); revealed=false; if(navigator.vibrate)navigator.vibrate(14); buildDeck(); }
+        function flipCard() {
+            const front = document.querySelector('.deck-card[data-pos="0"]');
+            if (front) {
+                front.classList.toggle('flipped');
+                const inner = front.querySelector('.flip-inner');
+                inner.style.transform = front.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+                if(navigator.vibrate)navigator.vibrate(10);
+            }
+        }
+
+        // ---- Apple Wallet fly-in (lightweight solid clone, GPU-friendly) ----
+        function addToWallet(btn) {
+            const front = document.querySelector('.deck-card[data-pos="0"]');
+            if (front) {
+                const r = front.getBoundingClientRect();
+                const ac = NovaPay.activeCard();
+                const ghost = document.createElement('div');
+                ghost.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:26px;z-index:300;pointer-events:none;will-change:transform,opacity;box-shadow:0 20px 50px -12px rgba(80,60,255,.6);background:${ac.network==='amex'?'linear-gradient(135deg,#12b6d6,#08528f)':'linear-gradient(135deg,#3a6bff,#7a49ff)'};`;
+                document.body.appendChild(ghost);
+                ghost.animate([
+                    { transform:'translateY(0) scale(1) rotate(0)', opacity:1 },
+                    { transform:'translateY(-30px) scale(.55) rotate(6deg)', opacity:.9, offset:.55 },
+                    { transform:'translateY(-220px) scale(.08) rotate(16deg)', opacity:0 }
+                ], { duration:750, easing:'cubic-bezier(.5,0,.75,0)' }).onfinish = () => ghost.remove();
+            }
+            if(navigator.vibrate)navigator.vibrate([10,30,20]);
+            const lbl=document.getElementById('wallet-lbl'), ic=document.getElementById('wallet-ic');
+            lbl.textContent='Added ✓'; ic.innerHTML='<i class="fa-solid fa-check"></i>'; ic.style.color='#12b886';
+            setTimeout(()=>{ lbl.textContent='Wallet'; ic.innerHTML='<i class="fa-brands fa-apple"></i>'; ic.style.color='var(--nv-ink)'; }, 1800);
+        }
+
+        // ---- animated bottom sheet ----
+        function openSheet(type) {
+            const ov=document.getElementById('sheet-ov'), body=document.getElementById('sheet-body');
+            if (type==='report') {
+                body.innerHTML = `
+                    <div class="sheet-grab"></div>
+                    <div class="sheet-ic" style="background:rgba(240,80,110,.16);color:#f0506e"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Report this card?</h3>
+                    <p>We'll instantly freeze <b>${NovaPay.activeCard().network==='amex'?'Amex ··1007':'Visa ··8144'}</b> and ship a replacement in 3–5 days.</p>
+                    <button class="sheet-btn danger" onclick="confirmReport()">Freeze & Replace</button>
+                    <button class="sheet-btn ghost" onclick="closeSheet()">Cancel</button>`;
+            }
+            ov.classList.add('open');
+            if(navigator.vibrate)navigator.vibrate(12);
+        }
+        function closeSheet(){ document.getElementById('sheet-ov').classList.remove('open'); }
+        function confirmReport() {
+            const ac=NovaPay.activeCard(); if(!ac.frozen) NovaPay.toggleFreeze(ac.id);
+            if(navigator.vibrate)navigator.vibrate([15,40,15]);
+            const body=document.getElementById('sheet-body');
+            body.innerHTML = `
+                <div class="sheet-grab"></div>
+                <div class="sheet-ic" style="background:rgba(18,184,134,.16);color:#12b886"><i class="fa-solid fa-check"></i></div>
+                <h3>Card reported</h3>
+                <p>Your card is frozen and a replacement is on the way. Ref #RP-${Math.abs(ac.last4*7)%99999}.</p>
+                <button class="sheet-btn" onclick="closeSheet();buildDeck()">Done</button>`;
+        }
+
+        function doFreeze() {
+            const ac = NovaPay.activeCard();
+            NovaPay.toggleFreeze(ac.id);
+            if(navigator.vibrate)navigator.vibrate(NovaPay.activeCard().frozen?[15,30,15]:12);
+            buildDeck();
+        }
+        function doReveal() {
+            revealed = !revealed;
+            const el = document.querySelector('.deck-card[data-pos="0"] .cnum');
+            const ac = NovaPay.activeCard();
+            if (!el) return;
+            if (revealed) {
+                const real = fullNum(ac); let it=0;
+                const iv = setInterval(()=>{ el.textContent = real.split('').map((ch,i)=> ch===' '?' ' : (i<it? ch : Math.floor(Math.random()*10))).join(''); if(it++>=real.length){clearInterval(iv); el.textContent=real;} }, 40);
+            } else el.textContent = '•••• •••• •••• ' + ac.last4;
+
+            // the security codes live on the front (Amex CID) and back (CVV) of the
+            // same card — reveal has to unmask them too, not just the number
+            const front = document.querySelector('.deck-card[data-pos="0"]');
+            if (front && ac.cvv) {
+                const cvvEl = front.querySelector('.cvv-box');
+                if (cvvEl) cvvEl.textContent = revealed ? ac.cvv : '•'.repeat(ac.cvv.length);
+                const cidEl = front.querySelector('.amex-cid');
+                if (cidEl) cidEl.textContent = revealed ? ac.cvv : '•'.repeat(ac.cvv.length);
+            }
+            renderControls();
+        }
+
+        function renderControls() {
+            const ac = NovaPay.activeCard();
+            document.getElementById('freeze-lbl').textContent = ac.frozen ? 'Frozen' : 'Freeze';
+            document.getElementById('reveal-lbl').textContent = revealed ? 'Hide' : 'Reveal';
+            document.getElementById('reveal-ic').className = revealed ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+            const spent=ac.spentCents||0, lim=ac.limitCents||1, pct=Math.min(100,Math.round(spent/lim*100));
+            document.getElementById('spent').textContent = NovaPay.fmt(spent);
+            document.getElementById('limit').textContent = NovaPay.fmt(lim);
+            document.getElementById('bar').style.width = pct+'%';
+            document.getElementById('pct').textContent = pct+'% used this month';
+
+            // card details panel
+            const num = revealed ? fullNum(ac) : '•••• •••• •••• ' + ac.last4;
+            document.getElementById('details').innerHTML = `
+                <div class="drow"><span class="k">Network</span><span class="v">${ac.network==='amex'?'American Express':'Visa Infinite'}</span></div>
+                <div class="drow"><span class="k">Card Number</span><span class="v num">${num}</span></div>
+                <div class="drow"><span class="k">Card Holder</span><span class="v">${ac.holder}</span></div>
+                <div class="drow"><span class="k">Expires</span><span class="v num">${ac.exp}</span></div>
+                <div class="drow"><span class="k">CVV</span><span class="v num">${revealed ? (ac.network==='amex'?'1007':'772') : '•••'}</span></div>
+                <div class="drow"><span class="k">Status</span><span class="${ac.frozen?'badge-frozen':'badge-ok'}">${ac.frozen?'Frozen':'Active'}</span></div>`;
+        }
+
+        // Apple-Wallet style: 3D tilt-parallax on hover/touch + 60fps swipe-up to switch.
+        function attachSwipe() {
+            const front = document.querySelector('.deck-card[data-pos="0"]');
+            if (!front) return;
+            const glare = front.querySelector('.glare');
+            const inner = front.querySelector('.flip-inner');
+            let sx=0, sy=0, down=false, moved=false, raf=0;
+            let tiltX=0, tiltY=0, dragY=0, dragX=0, mode='';   // mode: 'tilt' | 'swipe'
+
+            const apply = () => {
+                raf = 0;
+                if (mode==='swipe') {
+                    front.style.transform = `translate3d(${dragX*.3}px,${dragY}px,0) scale(${1+dragY/2600}) rotate(${dragX/60}deg)`;
+                    front.style.opacity = String(Math.max(.4, 1+dragY/340));
+                } else {
+                    // tilt the inner (so flip still works), glare follows finger
+                    inner.style.transform = `rotateX(${tiltY}deg) rotateY(${tiltX}deg)` + (front.classList.contains('flipped')?' rotateY(180deg)':'');
+                }
+            };
+            const schedule = () => { if(!raf) raf = requestAnimationFrame(apply); };
+
+            front.onpointerdown = e => {
+                down=true; moved=false; mode=''; sx=e.clientX; sy=e.clientY;
+                front.classList.add('tilting');
+                front.setPointerCapture && front.setPointerCapture(e.pointerId);
+            };
+            front.onpointermove = e => {
+                if(!down) return;
+                const dx=e.clientX-sx, dy=e.clientY-sy;
+                if(!mode && (Math.abs(dx)>4||Math.abs(dy)>4)){ moved=true; mode = (dy < -8 && Math.abs(dy)>Math.abs(dx)) ? 'swipe' : 'tilt'; if(mode==='swipe'){front.classList.add('dragging');front.classList.remove('tilting');} }
+                if (mode==='swipe') { dragY=Math.min(0,dy); dragX=dx; }
+                else {
+                    const r=front.getBoundingClientRect();
+                    tiltX = ((e.clientX-r.left)/r.width - .5) * 22;   // left/right
+                    tiltY = -((e.clientY-r.top)/r.height - .5) * 22;  // up/down
+                    glare.style.setProperty('--gx', ((e.clientX-r.left)/r.width*100)+'%');
+                    glare.style.setProperty('--gy', ((e.clientY-r.top)/r.height*100)+'%');
+                }
+                schedule();
+            };
+            const reset = () => {
+                inner.style.transform = front.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+                front.style.transform=''; front.style.opacity='';
+                front.classList.remove('tilting','dragging');
+            };
+            front.onpointerup = e => {
+                if(!down) return; down=false;
+                const dy=e.clientY-sy, dx=e.clientX-sx;
+                if (mode==='swipe' && dy < -55) {
+                    const cards=order(), next=cards[1];
+                    if(next){ if(navigator.vibrate)navigator.vibrate([10,22,10]); reset(); NovaPay.setActiveCard(next.id); revealed=false; buildDeck(); return; }
+                } else if (!moved) {
+                    front.classList.toggle('flipped'); if(navigator.vibrate)navigator.vibrate(10);
+                }
+                reset();
+            };
+            front.onpointercancel = reset; front.onpointerleave = () => { if(!down) reset(); };
+        }
+
+        window.addEventListener('novapay:change', () => { NovaPay.reload(); buildDeck(); });
+        window.onload = () => {
+            const q = new URLSearchParams(location.search).get('card');
+            if (q && NovaPay.cards().some(c=>c.id===q)) NovaPay.setActiveCard(q);
+            buildDeck();
+        };
+    </script>
+    <script src="haptics.js?v=16" defer></script>
+</body>
+</html>
