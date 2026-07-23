@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="VISA-PAY-2.0/Visa-Pay-UI-main/screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
+  <img src="Visa-Pay-UI-main/screenshots/Gemini_Generated_Image_o9i45po9i45po9i4-clean.png" width="100%" alt="Visa Pay UI 2.0">
 </p>
 
 <h1 align="center">Visa Pay UI 2.0</h1>
