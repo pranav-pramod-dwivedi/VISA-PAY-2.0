@@ -20,7 +20,7 @@
   `;
   document.head.appendChild(css);
 
-  const SEL = 'button, a, .tap, .glass-tap, [role="button"], .act, .ctrl, .switch button, .nv-item, .nv-fab, .ps-key, .key, .chip:not(.chip::before)';
+  const SEL = 'button, a, .tap, .glass-tap, [role="button"], .act, .ctrl, .switch button, .nv-item, .nv-fab, .ps-key, .key, .chip';
 
   // vibration patterns (ms). No-op on desktop / unsupported.
   function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
@@ -36,8 +36,10 @@
     try {
       const r = el.getBoundingClientRect();
       const size = Math.max(r.width, r.height);
-      const x = ((e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX) || (r.left + r.width / 2)) - r.left - size / 2;
-      const y = ((e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY) || (r.top + r.height / 2)) - r.top - size / 2;
+      const clientX = (e && e.touches && e.touches[0] ? e.touches[0].clientX : (e ? e.clientX : undefined));
+      const clientY = (e && e.touches && e.touches[0] ? e.touches[0].clientY : (e ? e.clientY : undefined));
+      const x = (typeof clientX === 'number' ? clientX : (r.left + r.width / 2)) - r.left - size / 2;
+      const y = (typeof clientY === 'number' ? clientY : (r.top + r.height / 2)) - r.top - size / 2;
       const cs = getComputedStyle(el);
       if (cs.position === 'static') el.style.position = 'relative';
       if (cs.overflow === 'visible') el.style.overflow = 'hidden';
@@ -47,7 +49,7 @@
       rip.style.left = x + 'px'; rip.style.top = y + 'px';
       el.appendChild(rip);
       rip.addEventListener('animationend', () => rip.remove(), { once: true });
-    } catch (e) {}
+    } catch (err) {}
 
     buzz(12);   // light tick
   }
