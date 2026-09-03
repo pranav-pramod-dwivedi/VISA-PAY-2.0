@@ -84,7 +84,7 @@
     sheet.innerHTML = `
       <div class="ps-grab"></div>
       <div class="ps-who">
-        <img class="ps-av" src="${avatar()}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ctx.name)}'">
+        <img class="ps-av" src="${avatar()}" alt="${ctx.name||'Recipient'}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(ctx.name)}'">
         <div><div class="ps-name">${verb} ${ctx.name}</div><div class="ps-handle">${ctx.handle||''}</div></div>
       </div>
       <div class="ps-amount"><span class="cur">$</span><span id="ps-amt">${amountDisplay()}</span></div>
@@ -95,7 +95,7 @@
         ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="ps-key" data-k="${n}">${n}</button>`).join('')}
         <button class="ps-key" data-k=".">.</button>
         <button class="ps-key" data-k="0">0</button>
-        <button class="ps-key" data-k="del"><i class="fa-solid fa-delete-left"></i></button>
+        <button class="ps-key" data-k="del" aria-label="Delete digit"><i class="fa-solid fa-delete-left"></i></button>
       </div>
       <button class="ps-cta" id="ps-next">${mode==='request'?'Send Request':'Continue'}</button>
       <a class="ps-link" id="ps-cancel">Cancel</a>
@@ -142,9 +142,9 @@
       <div class="ps-err" id="ps-err"></div>
       <div class="ps-pad">
         ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="ps-key" data-k="${n}">${n}</button>`).join('')}
-        <button class="ps-key" data-k="back"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="ps-key" data-k="back" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
         <button class="ps-key" data-k="0">0</button>
-        <button class="ps-key" data-k="del"><i class="fa-solid fa-delete-left"></i></button>
+        <button class="ps-key" data-k="del" aria-label="Delete digit"><i class="fa-solid fa-delete-left"></i></button>
       </div>
       <a class="ps-link" id="ps-cancel">Cancel</a>
     `;
