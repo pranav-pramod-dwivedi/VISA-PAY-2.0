@@ -88,6 +88,24 @@
             100% { transform: scale(1.4); opacity: 0; } 
         }
 
+        /* --- RETURN BUTTON --- */
+        .btn-return {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            color: #fff;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 14px;
+            margin-top: 28px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            box-shadow: 0 8px 20px -6px rgba(37, 99, 235, 0.5);
+            transition: transform 0.16s ease, box-shadow 0.16s ease;
+        }
+        .btn-return:active { transform: scale(0.96); box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.5); }
+
     </style>
 </head>
 <body>
@@ -118,10 +136,13 @@
             </div>
         </div>
 
+        <a href="home.html" class="btn-return">
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+            Return to Home
+        </a>
+
     </div>
 
     <script src="haptics.js?v=16" defer></script>
 </body>
 </html>
-
-
