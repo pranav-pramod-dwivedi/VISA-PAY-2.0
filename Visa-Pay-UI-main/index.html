@@ -122,6 +122,34 @@
             from { transform: translate(-10%, -10%) scale(1); }
             to { transform: translate(10%, 10%) scale(1.2); }
         }
+
+        /* --- Accessibility: respect reduced-motion preference --- */
+        /* The splash uses aggressive horizontal streaks, scaling, and blur that
+           can trigger vestibular discomfort. Users who request reduced motion get
+           a calm fade-in of the logo + Pay wordmark instead. */
+        @media (prefers-reduced-motion: reduce) {
+            .visa-logo {
+                animation: none;
+                opacity: 1;
+                transform: none;
+                filter: brightness(0) invert(1);
+                transition: opacity 0.4s ease;
+            }
+            .pay-box {
+                animation: none;
+                opacity: 1;
+                transform: none;
+                filter: none;
+                transition: opacity 0.4s ease 0.15s;
+            }
+            .ambient-light {
+                animation: none;
+            }
+            #stage,
+            #fade-overlay {
+                transition: opacity 0.4s ease;
+            }
+        }
     </style>
 </head>
 <body>
